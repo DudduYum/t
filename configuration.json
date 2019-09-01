@@ -1,0 +1,13 @@
+{
+	"pages": [
+		{
+			"service1": {
+				"template": "src/conf/service1.html",
+				"configuration": "src/conf/service1.json",
+				"components": [
+					
+				]
+			}
+		}
+	]
+}

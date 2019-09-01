@@ -1,0 +1,14 @@
+usage:
+	to build a project use
+
+		npm run build - build a production version of client
+
+		npm run dev - buile a developing version of the client
+
+		npm run <missing> - compile a server
+
+	to run test use
+
+		npm run devstart - run a watcher on server, so you don't have re load
+
+		npm run adev - run watcher on client side scripts
