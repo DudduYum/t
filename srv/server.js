@@ -4,8 +4,6 @@ import ServiceServer from 'src/js/server/ConfiguratorServer';
 import ServiceLogic from 'src/js/common/ConfiguratorLogicEngine';
 
 
-console.warn(Lib);
-
 const express = require('express');
 const socketIO = require('socket.io');
 const path = require('path');
@@ -50,7 +48,7 @@ let requestHandler = server.listen(PORT, () => console.log(`Listening on ${ PORT
 const io = socketIO(requestHandler);
 
 // Game Instances
-var confyLogic = new ServiceLogic({traceLevel: Lib.Trace.TRACE_NONE});
+var confyLogic = new ServiceLogic({ traceLevel: Lib.Trace.TRACE_NONE });
 global.hand = confyLogic;
 
 var confyServer = new ServiceServer(

@@ -1,7 +1,8 @@
+import { Lib } from 'lance-gg';
+import * as aframe from 'aframe';
 import ConfiguratorLogicEngine from 'js/common/ConfiguratorLogicEngine';
 import ServiceUserEngine from 'js/client/ServiceUser';
 import ObservableObject from '../js/common/ObservableObject.js';
-import * as aframe from 'aframe';
 
 
 global = Object.assign(
@@ -9,28 +10,28 @@ global = Object.assign(
 	aframe
 );
 
-console.warn(aframe);
 
 
 let $ = require('jquery');
 
-var serviceLogic = new ConfiguratorLogicEngine(
-	{
-		traceLevel: 4
-		// delayInputCount: 2
-	}
-);
+const options = {
+    traceLevel: Lib.Trace.TRACE_NONE,
+    delayInputCount: 3,
+    scheduler: 'render-schedule',
+    syncOptions: {
+        sync: 'extrapolate',
+        localObjBending: 0.6,
+        remoteObjBending: 0.8,
+        bendingIncrements: 6
+    },
+    autoConnect: false
+};
+
+var serviceLogic = new ConfiguratorLogicEngine( options );
 
 var serviceEngine = new ServiceUserEngine(
 	serviceLogic,
-	{
-		verbose: true,
-		scheduler: 'render-schedule',
-		syncOptions: {
-			sync: 'interpolate'
-		},
-		autoConnect: true
-	}
+	options
 );
 
 global.serviceEngine = serviceEngine;
@@ -45,7 +46,8 @@ $('body').keypress((e) => {
 		},
 		{}
 	);
-})
+});
+
 
 
 document.addEventListener('DOMContentLoaded', function(e) { serviceEngine.start(); });

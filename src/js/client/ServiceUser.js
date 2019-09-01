@@ -9,13 +9,13 @@ export default class ServiceUserEngine extends ClientEngine {
 		// gE.on('preStep', () => {console.log('prco dio');});
 	}
 
-	init() {
-		return super.init().then(
-			() => {
-				this.isReady = true;
-			}
-		);
-	}
+	// init() {
+	// 	return super.init().then(
+	// 		() => {
+	// 			this.isReady = true;
+	// 		}
+	// 	);
+	// }
 
 	start () {
 		super.start();

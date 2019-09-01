@@ -50,6 +50,7 @@ module.exports = {
 				{
 		      title: 'Production',
 					hash: true,
+					inject: 'head',
 					template: `${PAGES_DIR}/${page}`,
 					filename: `./${page.replace(/\.pug/, '.html')}`
 		    }

@@ -11,8 +11,7 @@ export default class ServiceLogic extends GameEngine {
 
 		this.physicsEngine = new CannonPhysicsEngine(
 			{
-				gameEngine: this,
-				dt: 500
+				gameEngine: this
 			}
 		);
 
@@ -32,6 +31,7 @@ export default class ServiceLogic extends GameEngine {
 
 
 	initWorld() {
+		console.warn('world has been initialized');
 		super.initWorld(
 			{
         worldWrap: true,
@@ -39,7 +39,6 @@ export default class ServiceLogic extends GameEngine {
         height: 3000
       }
 		);
-		console.warn('world has been initialized');
 	}
 
 	clientInputRecived (options) {
