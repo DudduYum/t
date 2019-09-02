@@ -24,7 +24,7 @@ const options = {
         remoteObjBending: 0.8,
         bendingIncrements: 6
     },
-    autoConnect: false
+    autoConnect: true
 };
 
 var serviceLogic = new ConfiguratorLogicEngine( options );
@@ -38,7 +38,6 @@ global.serviceEngine = serviceEngine;
 
 
 $('body').keypress((e) => {
-	// console.log(e.originalEvent.key);
 	serviceEngine.sendInput(
 		{
 			index: Math.round(Math.random() * 3),

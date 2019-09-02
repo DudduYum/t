@@ -31,7 +31,7 @@ export default class ServiceLogic extends GameEngine {
 
 
 	initWorld() {
-		console.warn('world has been initialized');
+		// console.warn('world has been initialized');
 		super.initWorld(
 			{
         worldWrap: true,
@@ -46,7 +46,7 @@ export default class ServiceLogic extends GameEngine {
 	}
 
 	clientSyncManger (options) {
-		console.log(options);
+		// console.log(options);
 		// console.log(this.world.queryObject({ instanceType: ObservableObject }));
 	}
 
@@ -63,6 +63,7 @@ export default class ServiceLogic extends GameEngine {
 	// }
 
 	onPlayerJoind(joinTime) {
+		console.warn('test');
 		this.addObjectToWorld(
 			new ObservableObject(
 				this,
