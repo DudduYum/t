@@ -37,16 +37,6 @@ var serviceEngine = new ServiceUserEngine(
 global.serviceEngine = serviceEngine;
 
 
-$('body').keypress((e) => {
-	serviceEngine.sendInput(
-		{
-			index: Math.round(Math.random() * 3),
-			value: e.originalEvent.key
-		},
-		{}
-	);
-});
-
 
 
 document.addEventListener('DOMContentLoaded', function(e) { serviceEngine.start(); });

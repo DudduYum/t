@@ -1,6 +1,10 @@
 // import {DynamicObject} from 'lance/client-module/lance-gg';
 // import DynamicObject from 'lance/serialize/DynamicObject';
-import {PhysicalObject3D, BaseTypes} from 'lance-gg';
+import {
+	PhysicalObject3D,
+	ThreeVector,
+	BaseTypes
+} from 'lance-gg';
 
 
 // var DynamicObject = require('lance/server/lance-gg').DynamicObject;
@@ -8,25 +12,63 @@ import {PhysicalObject3D, BaseTypes} from 'lance-gg';
 export default class ObservableObject extends PhysicalObject3D {
 	constructor (gameEngine, options, props) {
 		super(gameEngine, options, props);
+		this.size = new ThreeVector();
+		if (props) {
 
-		this.randomNumber = Math.random();
-		// this.configuration = {};
+			if (props.size) {
+				this.size.set(
+					props.size.x,
+					props.size.y,
+					props.size.z
+				);
+			}
+
+			if (props.position) {
+				this.position.set(
+					props.position.x,
+					props.position.y,
+					props.position.z
+				)
+			}
+		}
 	}
+
+	syncTo (other) {
+		super.syncTo(other);
+
+		this.size.x = other.size.x;
+		this.size.x = other.size.y;
+		this.size.x = other.size.z;
+	}
+
 
 	static get netScheme () {
 		return Object.assign(
 			{
-				randomNumber: {type: BaseTypes.TYPES.INT8}
+				size: {type: BaseTypes.TYPES.CLASSINSTANCE}
 			},
 			super.netScheme
 		);
 	}
 
+	changeModel (newModel) {
+
+	}
+
 	onAddToWorld(gameEngine) {
 		this.gameEngine = gameEngine;
-		console.log('tring to add object');
-		this.physicsObj = gameEngine.physicsEngine.addBox(1, 1, 2.9, 2, 0.01);
 
+		this.physicsObj = gameEngine.physicsEngine.addBox(
+			this.size.x,
+			this.size.y,
+			this.size.z,
+			10,
+			9
+		);
+
+		this.changeModel('use a method');
+
+		console.warn(this.physicsObj);
 
 		this.physicsObj.position.set(
 			this.position.x,
@@ -36,20 +78,28 @@ export default class ObservableObject extends PhysicalObject3D {
 
 		this.scene = gameEngine.renderer ? gameEngine.renderer.scene : null;
 		if (this.scene) {
-			let el = this.renderEl = document.createElement('a-sphere');
-			let p = this.position;
-			el.setAttribute('position', `${p.x} ${p.y} ${p.z}`);
-			el.setAttribute('geometry', `primitive: sphere; radius: ${5}; segmentsWidth: 32; segmentsHeight: 16`);
 
+			let el = this.renderEl = document.createElement('a-entity');
+
+			el.setAttribute(
+				'geometry',
+				{
+					primitive: 'box'
+				}
+			);
+
+
+			// el.setAttribute('scale', `${} ${} ${}`);
+
+			// el.setAttribute('game-object-id', this.id);
+			this.scene.appendChild(el);
 		}
 	}
 
-	syncTo (other) {
-		super.syncTo(other);
-		this.configuration = Object.assign(
-			{},
-			other.configuration
-		);
-		// this.configurations = other.configurations;
+	delateObjectFromScene () {
+		if (this.scene) {
+			console.log('deleting an object from 3D scene');
+		}
 	}
+
 }

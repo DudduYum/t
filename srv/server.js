@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 const serviceName = 'app';
 const INDEX = path.join(__dirname, `../${buildDir}/${serviceName}.html`);
 const LOGIC = path.join(__dirname, `../${buildDir}/${serviceName}.js`);
+const ASSETS = path.join(__dirname, `../${buildDir}/assets`);
 
 // // define routes and socket
 const server = express();
@@ -27,6 +28,12 @@ server.use(
 			__dirname,
 			buildDir
 		)
+	)
+);
+
+server.use(
+	express.static(
+		ASSETS
 	)
 );
 

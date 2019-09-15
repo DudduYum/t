@@ -8,6 +8,25 @@ class ServiceRenderer extends AFrameRenderer {
 
 		console.log('yo man, whats uup?');
 	}
+
+	init() {
+		return super.init().then(
+			()=> {
+					console.warn(document.querySelector('body'));
+					console.warn(document.querySelector('a-scene'));
+					// document.querySelector('a-assets').addEventListener('loaded',
+					// ()=>{
+					// 	console.log('assets loaded');
+					// 	document.body.classList.remove('loading');
+          //
+					// 	this.gameEngine.emit('_SLRENDERER_ready');
+					this.isReady = true;
+					// }
+				// );
+			}
+		);
+	}
 }
+
 
 export {ServiceRenderer};

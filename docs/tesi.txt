@@ -1,0 +1,61 @@
+
+Introduzionne
+
+	Il seguente lavoro di tesi e' nato in seguito a una mia formazione lavorative
+	presso un azzienda che si occupa di realizzazione e consegna dei configuratori
+	3D, orientati per il web, e la mia personale curiosita verso il mondo di realta
+	virtuale.
+	Vorrei tenere presente che il mio lavoro non perseguita li scopi di seguire
+	delle best pratice che il campo ha da ofrire in questo momento, ma valutare delle
+	nuove strade che possono essere presi in medesimo campo tra qualche anno valutando
+	cosi le loro potenzialita'. Nel mio progetto di tesi ho deciso di utilizzare un
+	noto framework per creazione dei contenuti VR basato sulla libreria THREE.JS, per
+	ralizzare il configuratore in ralta virtuale. Esistono gia analoghi con lo stesso
+	principio di funzionamento, cio che ho voluto fare io e' aggiungere il supporto
+	di multiplayer creando una mostra vr di configuratori.
+
+	I configurati di  (ma piutosto
+	concentrarsi su una particolare ramo di questo settore, ovvero lo sviluppo
+	di software vr utilizzando delle librerie per sviluppo web. Attualmente (fai
+	la ricerca su che punto sono aframe e altri in confronto con uniti/unreal)).
+
+	Prima di proseguire con descrizione vorrei riassumere il significato della parola
+	configuratore e descrivere che ruolo questo occupa al intreno di progetto web.
+	Il configuratore puo essere definito uno software ausiliario che permette di
+	guidare l'utente nella selezione o personalizzazione del prodotto. Basandomi
+	sulla mia esperienza lavorativa posso affermare che il configuratore puo essere
+	usato per raggiungere differenti scopi che sono
+
+		- essere un wizzard ausiliario che da delle informazioni utili sul utilizzo
+		del prodotto configurato mediante utillizzo di animazioni o evidenziamento
+		di dettagli che altimenti sarebbero stati difficilmente visibili
+
+		- uno strumento per verificare se la configurazione del utente sia effetuate
+		a seconda delle regole di abbinamento creati basandosi sugli proprieta fisici
+		dei materiali oppure scelte stilistiche del produttore
+
+
+Descrizione
+
+	Per realizzare il mio progetto io ho deciso usare il javascript framework
+	Afrmae perche' ho avuto l'interesse personale per questo framework, ho delle
+	conoscenze di javascript e standard ES6 e aframe e' gia supportato dalla lance-gg
+	il framework che permette di realizzare degli giocchi multiplayer.
+
+	L'idea del mio configuratore e' seguente utente puo accedere a un ambiente configurabile.
+	Utente puo variarare la dimensione della stanza e interragile con vari oggetti configurabili all
+	interno della stanza.
+
+	Ogni utente puo indicare la sua altezza che vera utilizzata per l'impostazione della camera.
+	Indicazione del valore corretto e' fondamenta dato che permette al utente di
+	percepire in magnera corretta gli oggetti 3D presenti nella scena e di conseguenza
+	immaginare meglio la lora vera dimensione.
+
+
+
+Archittettura di giochi onine
+
+	La progettazione di giocchi multiplayer, non affato semlice datto che e' neccessario
+	tenere in considerazione dei praticollari importanti come la comunczione e sincronizzazione
+	del stato del giocco gestione degli oggetti nel caso se un utente viene connesso e disconesso.
+	

@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const PATHS = {
 	src: '../src',
@@ -55,6 +56,11 @@ module.exports = {
 					filename: `./${page.replace(/\.pug/, '.html')}`
 		    }
 			)
+		),
+    new CopyPlugin(
+			[
+	      { from: 'src/static', to: '' },
+	    ]
 		)
 
   ],
@@ -62,7 +68,8 @@ module.exports = {
 		alias: {
 			// lance: path.resolve(__dirname, '../node_modules/lance-gg/src'),
 			lance: path.resolve(__dirname, '../node_modules/lance-gg/dist'),
-			js: path.resolve(__dirname, '../src/js')
+			js: path.resolve(__dirname, '../src/js'),
+			gameObjects: path.resolve(__dirname, '../src/js/common')
 		}
 	}
 };

@@ -1,0 +1,9 @@
+1. Aggiungere dei modeli alla scena
+	- scarica 2,3 modelli
+	- fai una chiamata per aggiungerli alla scena
+2. fare ray casting on domand
+	- se utente punta sul modello devo fare una azione
+
+
+
+3. Permattere update dei modelli nella scena
