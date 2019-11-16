@@ -45,7 +45,7 @@ module.exports = {
 	},
   plugins: [
     // new CleanWebpackPlugin(['dist/*']) for < v2 versions of CleanWebpackPlugin
-    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin(),
 		...PAGES.map(
 			page => new HtmlWebpackPlugin(
 				{
@@ -59,7 +59,12 @@ module.exports = {
 		),
     new CopyPlugin(
 			[
-	      { from: 'src/static', to: '' },
+	      {
+					from: 'src/static',
+					to: '',
+					force: true,
+					copyUnmodified: true
+				 },
 	    ]
 		)
 
@@ -70,6 +75,7 @@ module.exports = {
 			lance: path.resolve(__dirname, '../node_modules/lance-gg/dist'),
 			js: path.resolve(__dirname, '../src/js'),
 			gameObjects: path.resolve(__dirname, '../src/js/common')
-		}
+		},
+		extensions: ['.pug','.css','.sass', '.mjs', '.js', '.json', '.bin', '.gltf']
 	}
 };

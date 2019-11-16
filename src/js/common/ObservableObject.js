@@ -12,8 +12,22 @@ import {
 export default class ObservableObject extends PhysicalObject3D {
 	constructor (gameEngine, options, props) {
 		super(gameEngine, options, props);
-		this.size = new ThreeVector();
+
+		this.title = 'cube';
+
+		this.url = 'models/testingcube.glb';
+
+		this.description = 'It\'s a test cube';
+
+		this.groups = [];
+
+		this.size = new ThreeVector(0, 0, 0);
+		this.weight = 0;
+
 		if (props) {
+			if (props.weight) {
+				this.weight = props.weight;
+			}
 
 			if (props.size) {
 				this.size.set(
@@ -31,25 +45,37 @@ export default class ObservableObject extends PhysicalObject3D {
 				)
 			}
 		}
+		// console.warn(this.size);
+	}
+
+	static get netScheme () {
+		return Object.assign(
+			{
+				size: {type: BaseTypes.TYPES.CLASSINSTANCE},
+				weight: {type: BaseTypes.TYPES.FLOAT32},
+				title: { type: BaseTypes.TYPES.STRING },
+				description: { type: BaseTypes.TYPES.STRING },
+				url: { type: BaseTypes.TYPES.STRING },
+				groups: {
+					type: BaseTypes.TYPES.LIST,
+					itemType: BaseTypes.TYPES.STRING
+				}
+			},
+			super.netScheme
+		);
 	}
 
 	syncTo (other) {
 		super.syncTo(other);
 
 		this.size.x = other.size.x;
-		this.size.x = other.size.y;
-		this.size.x = other.size.z;
+		this.size.y = other.size.y;
+		this.size.z = other.size.z;
+
+		this.weight = other.weight;
 	}
 
 
-	static get netScheme () {
-		return Object.assign(
-			{
-				size: {type: BaseTypes.TYPES.CLASSINSTANCE}
-			},
-			super.netScheme
-		);
-	}
 
 	changeModel (newModel) {
 
@@ -62,13 +88,13 @@ export default class ObservableObject extends PhysicalObject3D {
 			this.size.x,
 			this.size.y,
 			this.size.z,
-			10,
+			this.weight? this.weight : 0,
 			9
 		);
 
 		this.changeModel('use a method');
 
-		console.warn(this.physicsObj);
+		// console.warn(this.physicsObj);
 
 		this.physicsObj.position.set(
 			this.position.x,
@@ -76,17 +102,42 @@ export default class ObservableObject extends PhysicalObject3D {
 			this.position.z
 		);
 
+
+    // client side rendering
 		this.scene = gameEngine.renderer ? gameEngine.renderer.scene : null;
 		if (this.scene) {
 
 			let el = this.renderEl = document.createElement('a-entity');
 
+			console.log(this);
+			// debugger;
+
 			el.setAttribute(
-				'geometry',
-				{
-					primitive: 'box'
-				}
+				'gltf-model',
+				`url(${this.url})`
 			);
+
+			el.setAttribute(
+				'configurable-asset',
+				''
+			);
+
+			el.setAttribute(
+				'testcomponent',
+				''
+			);
+
+			el.setAttribute(
+				'gui-interactable',
+				''
+			);
+
+			el.setAttribute(
+				'scale',
+				`${this.size.x} ${this.size.y} ${this.size.z}`
+			);
+
+
 
 
 			// el.setAttribute('scale', `${} ${} ${}`);

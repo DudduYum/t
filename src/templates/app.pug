@@ -3,5 +3,100 @@ head
 	meta(charset='UTF-8')
 	title Production
 a-scene
+	a-assets
+		a-asset-item(
+			id="testingcube",
+			src='models/testingcube.glb'
+		)
+	
+	
+	
+	//- a-entity(
+	//- 	id="box3",
+	//- 	position="-4 2 -6",
+	//- 	geometry="primitive: box",
+	//- 	material="shader: flat; color: red",
+	//- 	configurable
+	//- )
+	
+	//- a-entity(
+	//- 	gltf-model='#testingcube',
+	//- 	position='10 0 -3',
+	//- 	testcomponent
+	//- )
+	
+	//- a-entity(
+	//- 	gltf-model='url(models/testingcube.glb)',
+	//- 	position='10 0 -3',
+	//- 	testcomponent
+	//- )
+	
+	a-gui-flex-container(
+		flex-direction="column",
+		justify-content="center",
+		align-items="normal",
+		component-padding="0.1",
+		opacity="0.7",
+		width="4.5",
+		height="3.0",
+		position="2 1.5 -4",
+		rotation="0 0 0"
+	)
+		a-gui-button(
+			value="materiale1",
+			onhover="onhoveraction",
+			onclick="onclickaction"
+		)
+		
+		
+	
+	//- a-box(
+	//- 	id="box1",
+	//- 	position="-1 0.5 -3",
+	//- 	rotation="0 45 0",
+	//- 	color="#4CC3D9",
+	//- 	configurable-asset='',
+	//- 	event-set__enter="_event: mouseenter; color: #8FF7FF; _target: #box2; visible: false",
+	//- 	event-set__leave="_event: mouseleave; color: #4CC3D9; _target: #box2; visible: treu"
+	//- )
+	
+	//- a-box(
+	//- 	id="box2",
+	//- 	position="-5 0.5 -3",
+	//- 	rotation="0 45 0",
+	//- 	color="#4CC3D9",
+	//- 	event-set__enter="_event: mouseenter; color: #4CC3D9; _target: #box1; visible: false",
+	//- 	event-set__leave="_event: mouseleave; color: #8FF7FF; _target: #box1; visible: true"
+	//- )
+	
+	a-entity(
+		id="cameraRig",
+		position="0 1.6 0"
+	)
+		a-camera(
+			look-controls,
+			wasd-controls,
+			position="0 0 0"
+		)
+			a-gui-cursor(
+				id="cursor",
+				raycaster="objects: [gui-interactable]",
+				fuse="true",
+				fuse-timeout="2000",
+				cursor="fuse: true; fuseTimeout: 500",
+				design="reticle",
+				color="#009900"
+			)
+			//- a-cursor
+			//- a-entity(
+			//- 	cursor="fuse: true; fuseTimeout: 2000",
+			//- 	position="0 0 -1",
+			//- 	geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03",
+			//- 	material="color: black; shader: flat"
+			//- )
+
+	
+	
+	
 	a-entity(light='type: ambient')
 	a-entity(light='type: directional')

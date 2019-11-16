@@ -20,7 +20,7 @@ export default class ServiceLogic extends GameEngine {
 		);
 
 		CANNON = this.physicsEngine.CANNON;
-
+		this.CANNON = CANNON;
     // client
 		this.on('client__syncReceived', this.clientSyncManger.bind(this));
 
@@ -28,7 +28,7 @@ export default class ServiceLogic extends GameEngine {
     // common
 		this.on('playerJoined', this.onPlayerJoind.bind(this));
 		this.on('playerDisconnected', this.onPlayerDisconect.bind(this));
-		this.on('preStep', this.onStep.bind(this));
+		this.on('server__preStep', this.onStep.bind(this));
 
 
 		this.on('server__init', this.initGame.bind(this));
@@ -44,44 +44,110 @@ export default class ServiceLogic extends GameEngine {
 		// console.warn(observable);
 		// console.warn(params);
 
+
 		if (observable) {
 
 			// console.log(observable.position);
 		}
 	}
 
+
+	// client side
+	clientAdjustAvatarMovement (movements) {
+		// console.log(this.playerId);
+		// console.log(movements);
+		// console.log('porco dd');
+
+		let avatar = this.world.queryObject({ playerId: this.playerId });
+		// console.log(avatar);
+		if (avatar) {
+
+			avatar.move(movements);
+			// console.log(movements);
+			// console.log(avatar.physicsObj.quaternion.toAxisAngle());
+		}
+	}
+
 	initGame () {
 
+    // observable object
 		this.addObjectToWorld(
 			new ObservableObject(
 				this,
 				{
 				},
 				{
-					position: new ThreeVector(0, 0, 0),
-					size: new ThreeVector(3,3,3)
+					position: new ThreeVector(0, 0.5, -10),
+					size: new ThreeVector(1,1,1),
+					weight: 0
 				}
 			)
 		);
-    //
+
+    // front
 		// this.addObjectToWorld(
-		// 	new House(
+		// 	new ObservableObject(
 		// 		this,
-		// 		{},
 		// 		{
-		// 			position: new ThreeVector(0, 0, 0)
+		// 		},
+		// 		{
+		// 			position: new ThreeVector(0, 0.5, -10),
+		// 			size: new ThreeVector(1,1,1),
+		// 			weight: 0
 		// 		}
 		// 	)
 		// );
 
+    // right
+		// this.addObjectToWorld(
+		// 	new ObservableObject(
+		// 		this,
+		// 		{
+		// 		},
+		// 		{
+		// 			position: new ThreeVector(10, 0.5, 0),
+		// 			size: new ThreeVector(2, 2, 2),
+		// 			weight: 0
+		// 		}
+		// 	)
+		// );
+
+    // back
+		// this.addObjectToWorld(
+		// 	new ObservableObject(
+		// 		this,
+		// 		{
+		// 		},
+		// 		{
+		// 			position: new ThreeVector(0, 0.5, 10),
+		// 			size: new ThreeVector(3, 3, 3),
+		// 			weight: 0
+		// 		}
+		// 	)
+		// );
+
+    // left
+		// this.addObjectToWorld(
+		// 	new ObservableObject(
+		// 		this,
+		// 		{
+		// 		},
+		// 		{
+		// 			position: new ThreeVector(-10, 0.5, 0),
+		// 			size: new ThreeVector(4, 4, 4),
+		// 			weight: 0
+		// 		}
+		// 	)
+		// );
+
+
+    // creating a ground that contain all assets
 		let groundRotation = new CANNON.Quaternion();
 		groundRotation.setFromAxisAngle(
 			new CANNON.Vec3(1, 0, 0),
 			- Math.PI/2
 		);
 
-		console.warn(groundRotation.toAxisAngle());
-		// console.warn(groundRotation.toEuler());
 
 		this.addObjectToWorld(
 			new Ground(
@@ -98,31 +164,6 @@ export default class ServiceLogic extends GameEngine {
 		);
 	}
 
-	addRandomObject () {
-		let scene = this.renderer ? this.renderer.scene : null;
-
-		if (scene) {
-			let el = this.renderEl = document.createElement('a-entity');
-			// el.setAttribute('color', 'green');
-			el.setAttribute(
-				'geometry',
-				{
-					primitive: 'box',
-					height: 10,
-					width: 4
-				}
-			);
-			let randomX = (Math.random() * 20) - 10;
-			let randomY = (Math.random() * 20) - 10;
-			let randomZ = (Math.random() * 20) - 10;
-
-			el.setAttribute('position', `${randomX} ${randomY} ${randomZ}`);
-			el.setAttribute('rotation', '60 20 70');
-			scene.appendChild(el);
-			console.warn('now you can add');
-		}
-	}
-
 
 	initWorld () {
 		// console.warn('world has been initialized');
@@ -136,8 +177,6 @@ export default class ServiceLogic extends GameEngine {
 	}
 
 	clientSyncManger (options) {
-		// console.log(options);
-		// console.log(this.world.queryObject({ instanceType: ObservableObject }));
 	}
 
 	// step (isReenact, t, dt, physicsOnly) {
@@ -147,22 +186,20 @@ export default class ServiceLogic extends GameEngine {
 	// }
 
 	onPlayerJoind(opt) {
-
 		this.addObjectToWorld(
 			new Avatar(
 				this,
 				{},
 				{
-					position: new ThreeVector(0, 1, 0),
+					position: new ThreeVector(0, 0, 0),
 					velocity: new ThreeVector(0, 0.1, 0),
 					quaternion: new Quaternion(0.3, 0.4, 0.1, 0.1),
 					angularVelocity: new ThreeVector(0, 0.3, 0),
-					playerId: opt.playerId
+					playerId: opt.playerId,
+					height: 1.98
 				}
 			)
 		);
-
-		
 	}
 
 	onPlayerDisconect(playerDesc) {
@@ -179,12 +216,25 @@ export default class ServiceLogic extends GameEngine {
 		}
 	}
 
+
+  // Input recieved handeler
 	inputRecived (params) {
-		// console.warn(observable);
-		// console.warn(params);
-
-
 		if (params.input.input.command) {
+			var avatarObj = this.world.queryObject({ playerId: params.playerId });
+
+			console.log(params.input.input.params);
+			if (params.input.input.params && params.input.input.params.directionX) {
+				avatarObj.direction.set(
+					params.input.input.params.directionX,
+					0,
+					params.input.input.params.directionZ
+				);
+			}
+			if (params.input.input.params.test) {
+				console.warn(params.input.input.params.test);
+			}
+
+
 			switch (params.input.input.command) {
 				case 'restart':
 					var observable = this.world.queryObject({ instanceType: ObservableObject });
@@ -194,7 +244,7 @@ export default class ServiceLogic extends GameEngine {
 					}
 					break;
 				case 'init':
-				var h = this.world.queryObject({ instanceType: House });
+					var h = this.world.queryObject({ instanceType: House });
 
 					if (!h) {
 						this.addObjectToWorld(
@@ -210,10 +260,6 @@ export default class ServiceLogic extends GameEngine {
 						);
 					}
 					break;
-				default:
-					// unregistred
-					console.log(params.input.input);
-				break;
 			}
 		}
 	}
