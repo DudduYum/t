@@ -29,6 +29,7 @@
     "express": "^4.17.1",
     "jquery": "^3.4.1",
     "lance-gg": "^4.0.8",
+    "lodash": "^4.17.15",
     "net": "^1.0.2",
     "nodemon": "^1.19.4",
     "uninstall": "0.0.0"

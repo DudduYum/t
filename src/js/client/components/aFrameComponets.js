@@ -1,4 +1,6 @@
 // import EventEmitter from 'eventemitter3';
+import './a-configurator';
+
 import * as CANNON from 'cannon';
 // let emiter = new EventEmitter();
 // console.log(new EventEmitter());
@@ -45,47 +47,12 @@ AFRAME.registerComponent(
 	'testcomponent',
 	{
 		init: function () {
+			console.log('test components');
+			debugger;
 			console.log(this);
 		}
 	}
 );
-
-AFRAME.registerComponent(
-	'configurable-asset',
-	{
-		schema: {
-
-		},
-		init: function () {
-			this.ui = document.createElement('a-gui-flex-container');
-			this.ui.setAttribute( "flex-direction","column" );
-			this.ui.setAttribute( "justify-content","center" );
-			this.ui.setAttribute( "align-items","normal" );
-			this.ui.setAttribute( "component-padding","0.1" );
-			this.ui.setAttribute( "opacity","0.7" );
-			this.ui.setAttribute( "width","4.5" );
-			this.ui.setAttribute( "height","3.0" );
-			this.ui.setAttribute( "position","2 1.5 -4" );
-			this.ui.setAttribute( "rotation","0 0 0" );
-
-
-			this.el.addEventListener(
-				'click',
-				function (scope) {
-					return function (evt) {
-						console.log(evt);
-						console.log(this);
-						this.el.appendChild(this.ui);
-						// let document.createElement('a-entity');
-
-					}
-				}
-
-			)
-			// debugger;
-		}
-	}
-)
 
 
 AFRAME.registerComponent(

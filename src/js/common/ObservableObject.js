@@ -75,8 +75,6 @@ export default class ObservableObject extends PhysicalObject3D {
 		this.weight = other.weight;
 	}
 
-
-
 	changeModel (newModel) {
 
 	}
@@ -109,21 +107,27 @@ export default class ObservableObject extends PhysicalObject3D {
 
 			let el = this.renderEl = document.createElement('a-entity');
 
+
 			console.log(this);
 			// debugger;
 
-			el.setAttribute(
-				'gltf-model',
-				`url(${this.url})`
-			);
+			// el.setAttribute(
+			// 	'gltf-model',
+			// 	`url(${this.url})`
+			// );
+
 
 			el.setAttribute(
-				'configurable-asset',
-				''
+				'configurator',
+				`url:models/testingcube.glb;model:testingcube;id:${this.id}`
 			);
 
+			// el.setAttribute(
+			// 	'testcomponent',
+			// 	''
+			// );
 			el.setAttribute(
-				'testcomponent',
+				'configurator-ui-manager',
 				''
 			);
 
