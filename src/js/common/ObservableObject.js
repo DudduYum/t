@@ -6,12 +6,34 @@ import {
 	BaseTypes
 } from 'lance-gg';
 
+import {
+	KeyArrayParameter,
+	KeyPropertyParameter
+} from './configurationParameter.js';
+
 
 // var DynamicObject = require('lance/server/lance-gg').DynamicObject;
 
 export default class ObservableObject extends PhysicalObject3D {
 	constructor (gameEngine, options, props) {
 		super(gameEngine, options, props);
+
+		if (options && options.isOnServerSide) {
+
+			this.modelID = props.modelID;
+
+			this.configuration = props.configuration;
+			// this.configuration = [];
+
+
+			console.log('X');
+		} else {
+			console.log('O');
+			this.modelID = '';
+
+			this.configuration = [];
+		}
+
 
 		this.title = 'cube';
 
@@ -21,8 +43,13 @@ export default class ObservableObject extends PhysicalObject3D {
 
 		this.groups = [];
 
+		this.configurationKeys = [];
+		this.configurationValues = [];
+
 		this.size = new ThreeVector(0, 0, 0);
 		this.weight = 0;
+
+
 
 		if (props) {
 			if (props.weight) {
@@ -45,21 +72,52 @@ export default class ObservableObject extends PhysicalObject3D {
 				)
 			}
 		}
-		// console.warn(this.size);
+					// console.warn(this.size);
+	}
+
+	setModel (modelID) {
+		this.model
 	}
 
 	static get netScheme () {
 		return Object.assign(
 			{
+        // definitive
+
 				size: {type: BaseTypes.TYPES.CLASSINSTANCE},
-				weight: {type: BaseTypes.TYPES.FLOAT32},
-				title: { type: BaseTypes.TYPES.STRING },
-				description: { type: BaseTypes.TYPES.STRING },
 				url: { type: BaseTypes.TYPES.STRING },
-				groups: {
+				modelID: { type: BaseTypes.TYPES.STRING },
+
+				configuration: {
 					type: BaseTypes.TYPES.LIST,
-					itemType: BaseTypes.TYPES.STRING
+					itemType: BaseTypes.TYPES.CLASSINSTANCE
 				}
+				// ,
+				// coins: {
+				// 	type: BaseTypes.TYPES.LIST,
+				// 	itemType: BaseTypes.TYPES.UINT8
+				// },
+        // NOTE: Is there the way to get more of these types or it's not
+        // a good idea
+				// configurationKeys: {
+				// 	type: BaseTypes.TYPES.LIST,
+        //   // NOTE: It's important to set also itemType for LIST type
+				// 	itemType: BaseTypes.TYPES.STRING
+				// },
+				// configurationValues: {
+				// 	type: BaseTypes.TYPES.LIST,
+				// 	itemType: BaseTypes.TYPES.STRING
+				// },
+
+				// not definitive
+				// title: { type: BaseTypes.TYPES.STRING },
+				// weight: {type: BaseTypes.TYPES.FLOAT32},
+				// description: { type: BaseTypes.TYPES.STRING },
+
+				// groups: {
+				// 	type: BaseTypes.TYPES.LIST,
+				// 	itemType: BaseTypes.TYPES.STRING
+				// }
 			},
 			super.netScheme
 		);
@@ -72,6 +130,10 @@ export default class ObservableObject extends PhysicalObject3D {
 		this.size.y = other.size.y;
 		this.size.z = other.size.z;
 
+		this.url = other.url;
+		this.modelID = other.modelID;
+		this.configuration = other.configuration;
+
 		this.weight = other.weight;
 	}
 
@@ -81,6 +143,7 @@ export default class ObservableObject extends PhysicalObject3D {
 
 	onAddToWorld(gameEngine) {
 		this.gameEngine = gameEngine;
+
 
 		this.physicsObj = gameEngine.physicsEngine.addBox(
 			this.size.x,
@@ -108,24 +171,25 @@ export default class ObservableObject extends PhysicalObject3D {
 			let el = this.renderEl = document.createElement('a-entity');
 
 
-			console.log(this);
+			console.log(this.configuration);
 			// debugger;
 
 			// el.setAttribute(
 			// 	'gltf-model',
 			// 	`url(${this.url})`
 			// );
-
-
+			let conf = this.configuration.reduce(
+				(previous, current) => {
+					previous[current.key] = current.property;
+					return previous;
+				},
+				{}
+			);
 			el.setAttribute(
 				'configurator',
-				`url:models/testingcube.glb;model:testingcube;id:${this.id}`
+				`url:models/testingcube.glb;model:testingcube;id:${this.id};configuration:${JSON.stringify(conf)}`
 			);
 
-			// el.setAttribute(
-			// 	'testcomponent',
-			// 	''
-			// );
 			el.setAttribute(
 				'configurator-ui-manager',
 				''
@@ -136,6 +200,7 @@ export default class ObservableObject extends PhysicalObject3D {
 				''
 			);
 
+      // it's ok use scale, but I think configurator should do this
 			el.setAttribute(
 				'scale',
 				`${this.size.x} ${this.size.y} ${this.size.z}`

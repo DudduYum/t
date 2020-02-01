@@ -4,11 +4,29 @@ import EventEmitter from 'eventemitter3';
 
 import Avatar from 'gameObjects/Avatar';
 
+var constants = require ("../common/commonConstants.js").constants;
+
 global.emiter = new EventEmitter();
 
+
+
 export default class ServiceUserEngine extends ClientEngine {
+  /*It may be a good thing to let the user modify the method, to set the
+	way how the client will send configuration to the server */
+	sendConfiguration (conf) {
+		this.sendInput(
+			{
+				command: constants.userSendNewConfigurationChunk,
+				params: {
+					configuration: conf
+				}
+			}
+		);
+	}
+
 	constructor (gE, inputObj) {
 		super(gE, inputObj, ServiceRenderer);
+
 		this.scene = null;
 
 		this.gameEngine.on('objectAdded', this.onObjectAdd.bind(this));
@@ -17,6 +35,12 @@ export default class ServiceUserEngine extends ClientEngine {
 
 		this.gamePadList = [];
 
+		global.emiter.on(
+			constants.onConfigurationChangeEventName,
+			this.sendConfiguration.bind(this) // I left it like this becouse, I would
+      // like to give the possibility to whoever may came across this class, to
+      // modify its functionality by just extendi methods
+		)
 
 		if (global) {
 			global.addEventListener(
@@ -28,19 +52,19 @@ export default class ServiceUserEngine extends ClientEngine {
 				})(this)
 			);
 
-			global.addEventListener(
-				'keydown',
-				function (e) {
-					console.log('test');
-					switch (e.key) {
-						case 't':
-							console.log('t');
-							break;
-						default:
-
-					}
-				}
-			)
+			// global.addEventListener(
+			// 	'keydown',
+			// 	function (e) {
+			// 		console.log('test');
+			// 		switch (e.key) {
+			// 			case 't':‘’
+			// 				console.log('t');
+			// 				break;
+			// 			default:
+      //
+			// 		}
+			// 	}
+			// )
 		}
 
 

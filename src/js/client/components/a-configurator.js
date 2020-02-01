@@ -1,45 +1,67 @@
 import './a-configurator-system';
 import _ from 'lodash';
+import AFrameCustomProperty from '../../utils/aframeCustomProperty.js';
+// import {constants} from '../../common/commonConstants.js';
 
-const CONFIGURATOR_ID_ATTRIBUTE_NAME = 'configuratorId';
+
+const CONFIGURATOR_ID_ATRIBUTE_NAME = 'configuratorId';
 
 AFRAME.registerComponent(
 	'configurator',
 	{
 		schema: {
 			id: {type: 'int'},
+			modelIsLoaded: {type: 'boolean'},
 			model: {type: 'string'},
 			url: {type: 'string', default: 'path non specificato'},
-			loaded: {type: 'boolean', default: 'false'}
-			// configuration: {type: 'object'}
+			loaded: {type: 'boolean', default: 'false'},
+			configuration: AFrameCustomProperty.getObjectProperty('{}')
 		},
 
 		onModelLoad: function (obj) {
+			const scope = this;
+			obj.name = this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME);
+
 			this.el.setObject3D(
-				'mesh',
+				// 'mesh',
+				this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME),
+				// 'test',
 				obj.scene.children.reduce(
 					(rootObj, singleMesh) => {
 
 						rootObj.add(singleMesh);
-						singleMesh.material = this.system.getConfigurationForIdAndMesh(this.data.id , singleMesh.name);
-						// singleMesh.material = this.system.getSelectedMaterialForModelMesh('testingcube' , singleMesh.name);
+						// singleMesh.material = this.system.getConfigurationForIdAndMesh(this.data.id , singleMesh.name);
 
+						scope.data.modelIsLoaded = true;
+						// scope.el.setAttribute('configurator', true);
+
+            // I don't know if this is the correct way but
+            // it works, so for now I will not dubt it
 						// debugger;
 						return rootObj;
 					},
 					new THREE.Object3D()
 				)
 			);
-
-
-			// this.el.setAttribute('testcomponent', '')
+			this.update();
 
 		},
+
+		tick: function () {
+			if (this.system.isUpdateIsNeeded(this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME))) {
+        // I realy don't know if it's legal, but it fucking works
+				this.update();
+			}
+		},
+
 		init: function () {
+
+
       // a-frame gltf-model init method, since I don't know if there is a way
       // to extend existent
 			this.system.registerConfigurableObject(
 				this.data.id,
+				{},
 				this.data.model
 			);
 
@@ -56,8 +78,9 @@ AFRAME.registerComponent(
 				onModelLoadBinded
 			);
 
-			this.el.setAttribute(CONFIGURATOR_ID_ATTRIBUTE_NAME, this.data.id);
+			this.el.setAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME, this.data.id);
 
+      // note not sure why I add this to
 			this.el.addEventListener(
 				'click',
 				(function (scope) {
@@ -70,7 +93,7 @@ AFRAME.registerComponent(
 							(item) => {
 								if (item.hasAttribute('rk-type')) {
 									item.setAttribute('opacity', '0');
-									console.log(item);
+									console.log('hi');
 								}
 							}
 						);
@@ -80,12 +103,47 @@ AFRAME.registerComponent(
 				})(this)
 
 			)
-			// debugger;
+			this.data.modelIsLoaded = false;
+			// debugger
+			document.addEventListener(
+			// this.el.addEventListener(
+				global.onConfigurationChangeEventName,
+				function (e) {
+					console.log('hi i like trains');
+				}
+			);
 		},
-		update: function () {}
+
+		update: function (oldData) {
+			if (
+				this.system.isUpdateNeeded(
+					this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME)
+				) &&
+				this.data.modelIsLoaded
+			) {
+
+
+				let self = this;
+				this.el.getObject3D(this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME)).children
+				.map(
+					(child) => {
+						child.material = this.system.getMaterialById(
+							self.data.configuration[child.name]
+						);
+					}
+				);
+			}
+		}
 	}
+
+	// NOTE: I must register an event handler to consume the evet and trigger
+  // update
 )
 
+global.testfunction = function (argv) {
+	console.warn('hi');
+	console.log(argv);
+}
 
 AFRAME.registerComponent(
 	'configurator-ui-manager',
@@ -95,7 +153,6 @@ AFRAME.registerComponent(
 		},
 
 		addButtonsForConfigurablePart: function (buttonsDescription) {
-			console.log(this);
 			if (!this.ui) {
 				throw new Error('Ui object wasn\'t defined');
 			}
@@ -104,8 +161,6 @@ AFRAME.registerComponent(
 					let offset = 0.4;
 					buttonsDescription[meshName].map(
 						(btnDefinition) => {
-							console.log(btnDefinition);
-							debugger;
 
 							let buttonActiveColor = this.configuratorSystem.data.buttonActiveColor;
 							let	buttonBorderColor = this.configuratorSystem.data.buttonBorderColor;
@@ -117,8 +172,10 @@ AFRAME.registerComponent(
 							button.setAttribute('font-family', 'Serif');
 							button.setAttribute('margin', `0 0 ${offset} 0`);
 							button.setAttribute('value', `${offset}`);
+							button.setAttribute('onclick', `changeConfigurationHandler(["${this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME)}", "${meshName}", "${btnDefinition}"])`);
+							button.setAttribute('onhover', 'testfunction');
 
-							offset += 0.01;
+							offset += 0.1;
 
 							this.ui.appendChild(button);
 						}
@@ -131,10 +188,6 @@ AFRAME.registerComponent(
 
 		init: function () {
 			this.configuratorSystem = document.querySelector('a-scene').systems['configurator'];
-			// console.log(this.el.getAttribute(CONFIGURATOR_ID_ATTRIBUTE_NAME));
-			let currentConfiguration = this.configuratorSystem.getConfigurationById(this.el.getAttribute(CONFIGURATOR_ID_ATTRIBUTE_NAME));
-			let configurationLogic = this.configuratorSystem.getConfigurationLogicFor(this.el.getAttribute(CONFIGURATOR_ID_ATTRIBUTE_NAME));
-
 
 			let configurationPanelColor = this.configuratorSystem.data.configurationPanelColor;
 			let buttonActiveColor = this.configuratorSystem.data.buttonActiveColor;
@@ -162,7 +215,7 @@ AFRAME.registerComponent(
 			// this.button = document.createElement('a-gui-button');
 
 			_.map(
-				this.configuratorSystem.getConfigurationLogicFor(this.el.getAttribute(CONFIGURATOR_ID_ATTRIBUTE_NAME)),
+				this.configuratorSystem.getConfigurationLogicFor(this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME)), //configurationLogic
 				// (item) => {
 				// 	console.log(item);
 				// }

@@ -5,10 +5,10 @@ export default class AFrameCustomProperty {
 		return ++configurableCnt;
 	}
 
-	static getObjectProperty(defaultValue = '{}') {
+	static getObjectProperty(defaultValue ) {
 		return {
 			default: defaultValue,
-			parse: function (value) {
+			parse: function (value='{}') {
 				return JSON.parse(value);
 			},
 			stringify: function (value) {

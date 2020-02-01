@@ -1,4 +1,11 @@
 import AFrameCustomProperty from '../../utils/aframeCustomProperty.js';
+import _ from 'lodash';
+import {constants} from '../../common/commonConstants.js';
+
+// deprecated
+// const onConfigurationChangeEventName = 'currentUserChangeConfiguration';
+global.onConfigurationChangeEventName = constants.onConfigurationChangeEventName;
+// global.onConfigurationChangeEventName = onConfigurationChangeEventName;
 
 AFRAME.registerSystem(
 	'configurator',
@@ -11,12 +18,20 @@ AFRAME.registerSystem(
 			buttonBorderColor: {type: 'string'},
 			buttonActiveColor: {type: 'string'},
 
+      // client side propertys
+			updateRequest: AFrameCustomProperty.getObjectProperty(),
+
+
+      // both side properties
       // array that contains all materials
 			materialLibrary: {type: 'array'},
 
       // dictinary that contains <model name> => <path to model>
 			modelList: AFrameCustomProperty.getObjectProperty(),
 
+			configurationLogic: AFrameCustomProperty.getObjectProperty(),
+			configuration: AFrameCustomProperty.getObjectProperty(),
+			configurableObjects: AFrameCustomProperty.getObjectProperty()
 			// configuration: {
 			// 	default: '{}',
 			// 	parse: function (value) {
@@ -26,19 +41,128 @@ AFRAME.registerSystem(
 			// 		return JSON.stringify(value);
 			// 	}
 			// },
-			configuration: AFrameCustomProperty.getObjectProperty(),
-			configurableObjects: AFrameCustomProperty.getObjectProperty(),
-			configurationLogic: AFrameCustomProperty.getObjectProperty()
 	  },
 
-		/*needed to register a configurable object in to e system
-		this way you just need an object id mesh name, and material
-		index to configure the object apearence and there will be
-		less information to exage toword othe user*/
-		registerConfigurableObject: function (id, model) {
-			this.data.configurableObjects[id] = model;
+		init: function() {
+			var path = this.data.dracoDecoderPath;
+			this.dracoLoader = new THREE.DRACOLoader();
+			this.dracoLoader.setPath(path);
+
+			// register the event listetener for configuration update
+			emiter.on(
+				'configurationObjectUpdate',
+				function(arg) {
+					// NOTE: now you must update the current system state
+					// with the new parameters caming from the server
+				}
+			);
+
+			this.data.configurationPanelColor = '#cccfff';
+			this.data.buttonBorderColor = '#42fc10';
+			this.data.buttonActiveColor = '#cccfff';
+
+
+			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({
+				color: '#333'
+			}));
+			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({
+				color: 'green'
+			}));
+			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({
+				color: 'red'
+			}));
+			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({
+				color: 'blue'
+			}));
+			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({
+				color: '#531'
+			}));
+
+			this.data.modelList.testingcube = 'models/testingcube.glb';
+
+
+			// this object take trace of which configurable
+			// object use which model
+			this.data.configurableObjects.testingcube = {};
+
+			this.data.updateRequest.testingcube = {};
+
+			this.data.configurationLogic.testingcube = {};
+			this.data.configurationLogic.testingcube.meshes = {};
+			this.data.configurationLogic.testingcube.meshes.Cube = [1, 3];
+
+			// global[constants.changeConfigurationHandlerEventName] = this.changeConfiguration.bind(this);
+			// debugger
+			global.changeConfigurationHandler = this.changeConfiguration.bind(this);
 		},
 
+
+		// API
+		// this method return material by material id,
+		// all configurators know their configuration, the thing they don't know
+		// are what corresponde to that material idnx, so they knowlage lakes
+		// material definition
+		getMaterialById: function (materialID) {
+			// return this.data.materialLibrary[Math.round(Math.random() * this.data.materialLibrary.length)];
+			return this.data.materialLibrary[materialID];
+		},
+
+		getDefaultMaterial: function () {
+      // NOTE: this is usefull, but right now it's not correct,
+      // it must return material not it index
+
+			return 0;
+		},
+
+    // API
+		/*needed to register a configurable object in to a system
+		this way you just need an object id
+		to configure the object apearence and there will be
+		less information to exchage toword othe user*/
+		registerConfigurableObject: function (id, configuration, model) {
+
+
+
+      // register an id as a model
+			this.data.configurableObjects[id] = model;
+
+
+      // initialize the configuration
+			const scope = this;
+
+			// the first initialization, right now
+      // it's static, each object is initialized
+      // in exactly same way. Later on I will
+      // think about some better way to initialize
+			this.data.configuration [id] = _.reduce(
+				this.data.configurationLogic[model].meshes,
+				function (conf, optList, mesh) {
+					conf[mesh] = _.head( optList );
+
+					if (!conf[mesh]) {
+						conf[mesh] = scope.getDefaultMaterial();
+					}
+
+					return conf;
+				},
+				{}
+			);
+			this.data.configuration [id] = ['meshes'].reduce(
+				(acc, meshes) => {
+
+					return {
+						'meshes': acc
+					};
+				},
+				configuration
+			);
+			this.data.configuration [id] = configuration;
+			// request configuration update
+      // it's not the best way to pass staff
+			this.data.updateRequest[id] = true;
+		},
+
+    // API
     /*when you create an gameobject you just tell it which model
 		it should load to the scene not where to find the model,
 		this method is used to get the path to the model, this way
@@ -51,11 +175,25 @@ AFRAME.registerSystem(
 			return this.data.modelList[this.data.configurableObjects[id]]
 		},
 
+    // API
+		isUpdateNeeded: function (id) {
+			return this.data.updateRequest[id];
+		},
 
+		getUpdateRequirements: function (id) {
+			const update = this.data.updateRequest[id];
+
+			this.data.updateRequest[id] = false;
+
+			return update;
+
+		},
+
+    // API
 		/*this method gives you info about how to configure the
 		model*/
 		getConfigurationById: function (id) {
-			return this.data.configuration[this.data.configurableObjects[id]]
+			return this.data.configuration[id];
 		},
 
 
@@ -63,12 +201,37 @@ AFRAME.registerSystem(
 		getConfigurationForIdAndMesh: function (id, mesh) {
 
 			return this.data.materialLibrary[
-				this.data.configurationLogic[
-					this.data.configurableObjects[id]
-				].meshes[mesh][0]
-				];
+				this.data.configuration[id][mesh]
+			];
+
 		},
 
+    /*this function is called on every update configuration, there
+		is no way right now to connect to configurators and force them to apply
+		new changes, so for this task the system just lanch an event with
+		default name, each configurator is listening for the event and decide
+		if it must do something with it.*/
+		changeConfiguration: function (argv) {
+			// this.data.
+
+			this.data.updateRequest[argv[0]] = true;
+			global.emiter.emit(
+				constants.onConfigurationChangeEventName,
+				// NOTE: this event will be consumed by clientClass
+				argv
+			);
+
+
+		},
+
+    /*UPDATING MANAGMENT*/
+		isUpdateIsNeeded: function (id) {
+			return this.data.updateRequest[id];
+		},
+
+		registerAccomplishedUpdate: function (id) {
+			this.data.updateRequest[id] = false;
+		},
 
 		getConfigurationLogicFor: function (configurableObjectID) {
 			return this.data.configurationLogic[
@@ -76,34 +239,7 @@ AFRAME.registerSystem(
 			];
 		},
 
-	  init: function () {
-	    var path = this.data.dracoDecoderPath;
-	    this.dracoLoader = new THREE.DRACOLoader();
-	    this.dracoLoader.setPath(path);
 
-			this.data.configurationPanelColor = '#cccfff';
-			this.data.buttonBorderColor = '#42fc10';
-			this.data.buttonActiveColor = '#cccfff';
-
-			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({color:'green'}));
-			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({color:'red'}));
-			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({color:'blue'}));
-			this.data.materialLibrary.push(new THREE.MeshBasicMaterial({color:'#531'}));
-
-			this.data.modelList.testingcube = 'models/testingcube.glb';
-
-			this.data.configuration.testingcube = {};
-			this.data.configuration.testingcube.meshes = {};
-			this.data.configuration.testingcube.meshes.Cube = 3;
-
-      // this object take trace of which configurable
-      // object use which model
-			this.data.configurableObjects.testingcube = {};
-
-			this.data.configurationLogic.testingcube = {};
-			this.data.configurationLogic.testingcube.meshes = {};
-			this.data.configurationLogic.testingcube.meshes.Cube = [0, 3];
-	  },
 
 		getMaterialsForConfigurableObject: function (model, meshname) {
 			return this.data.materialLibrary[this.data.configurableObjects[model].meshes[meshname]];
@@ -129,7 +265,6 @@ AFRAME.registerSystem(
 	  getDRACOLoader: function () {
 	    return this.dracoLoader;
 	  },
-
 
 		configureObject: function (configurableObjectID, configurationUpdate) {
 			this.data.configuration
