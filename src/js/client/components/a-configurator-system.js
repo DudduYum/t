@@ -212,8 +212,6 @@ AFRAME.registerSystem(
 		default name, each configurator is listening for the event and decide
 		if it must do something with it.*/
 		changeConfiguration: function (argv) {
-			// this.data.
-
 			this.data.updateRequest[argv[0]] = true;
 			global.emiter.emit(
 				constants.onConfigurationChangeEventName,

@@ -14,45 +14,8 @@ export default class ConfigurationObject extends GameObject {
 		super(gameEngine, options, props);
 
 
-		this.materialLibrary = [];
 
-		let mistery
 
-		this.configurationLogic = ['Cube'].map(
-			function (mesh) {
-				let meshOptions = new KeyArrayParameter(gameEngine, options, props);
-				meshOptions.setValue(
-					mesh,
-					[
-						'1',
-						'3'
-					]
-				);
-				return meshOptions;
-			}
-		);
-
-		this.modelListKeys = [];
-		this.modelListValues = [];
-		this.modelListUpdateVector = [];
-
-		this.configurationLogicKeys = [];
-		this.configurationLogicValues = [];
-		this.configurationLogicUpdateVector = [];
-
-		this.configurationKeys = [];
-		this.configurationValues = [];
-		this.configurationUpdateVector = [];
-
-		this.configurableObjectsKeys = [];
-		this.configurableObjectsValues = [];
-		this.configurationUpdateVector = [];
-
-		this.init();
-	}
-
-	init() {
-		// this.configurationLogic
 	}
 
 

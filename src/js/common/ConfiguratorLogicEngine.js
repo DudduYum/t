@@ -8,9 +8,10 @@ import Ground from './Ground.js';
 import Avatar from './Avatar.js';
 import House from './rooms/house1.js';
 
+const constants = require ("../common/commonConstants.js").constants;
 
-
-var constants = require ("../common/commonConstants.js").constants;
+// import constants from './commonConstants.js';
+// import constants from '../common/commonConstants.js';
 
 import {
 	GameEngine,
@@ -46,6 +47,16 @@ export default class ServiceLogic extends GameEngine {
 		this.on('server__init', this.initGame.bind(this));
 		this.on('server__processInput', this.inputRecived.bind(this));
 
+    // hard coded for now
+		this.configurationLogic = {
+			'testingcube': {
+				'Cube': [
+					1,
+					4
+
+				]
+			}
+		};
 		// this.scene = this.renderer ? this.renderer.scene : null;
 		// if (this.scene) {
 		// 	console.log('Hi I am on client side');
@@ -122,6 +133,8 @@ export default class ServiceLogic extends GameEngine {
 				return meshConfiguration;
 			}
 		));
+
+
 		this.addObjectToWorld(
 			new ObservableObject(
 				gE,
@@ -286,9 +299,6 @@ export default class ServiceLogic extends GameEngine {
 				playerId: params.playerId
 			});
 
-			console.log(params.input.input.params);
-			console.log(params.input.input.command);
-			console.log(constants.userSendNewConfigurationChunk);
 			if (params.input.input.params && params.input.input.params.directionX) {
 				avatarObj.direction.set(
 					params.input.input.params.directionX,
@@ -329,15 +339,20 @@ export default class ServiceLogic extends GameEngine {
 					}
 					break;
 				case constants.userSendNewConfigurationChunk:
-					let conf = this.world.queryObject(
-						{
-							instanceType: ConfigurationObject
-						}
-					);
 
-					console.log(conf);
+					console.log('hi');
+					let configurator = this.world.queryObject({
+            // NOTE: remember it must be a number, not string
+						id: Number.parseInt(params.input.input.params.configuration[0])
+					});
 
-					// NOTE: now you must syncronize the the configurator
+
+					configurator.applyChanges([
+						[
+							params.input.input.params.configuration[1],
+							params.input.input.params.configuration[2]
+						]
+					]);
 					break;
 
 			}

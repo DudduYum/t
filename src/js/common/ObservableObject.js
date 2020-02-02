@@ -11,10 +11,54 @@ import {
 	KeyPropertyParameter
 } from './configurationParameter.js';
 
-
+import _ from 'lodash';
 // var DynamicObject = require('lance/server/lance-gg').DynamicObject;
 
 export default class ObservableObject extends PhysicalObject3D {
+	static get netScheme () {
+		return Object.assign(
+			{
+				// definitive
+
+				size: {type: BaseTypes.TYPES.CLASSINSTANCE},
+				url: { type: BaseTypes.TYPES.STRING },
+				modelID: { type: BaseTypes.TYPES.STRING },
+
+				configuration: {
+					type: BaseTypes.TYPES.LIST,
+					itemType: BaseTypes.TYPES.CLASSINSTANCE
+				}
+				// ,
+				// coins: {
+				// 	type: BaseTypes.TYPES.LIST,
+				// 	itemType: BaseTypes.TYPES.UINT8
+				// },
+				// NOTE: Is there the way to get more of these types or it's not
+				// a good idea
+				// configurationKeys: {
+				// 	type: BaseTypes.TYPES.LIST,
+				//   // NOTE: It's important to set also itemType for LIST type
+				// 	itemType: BaseTypes.TYPES.STRING
+				// },
+				// configurationValues: {
+				// 	type: BaseTypes.TYPES.LIST,
+				// 	itemType: BaseTypes.TYPES.STRING
+				// },
+
+				// not definitive
+				// title: { type: BaseTypes.TYPES.STRING },
+				// weight: {type: BaseTypes.TYPES.FLOAT32},
+				// description: { type: BaseTypes.TYPES.STRING },
+
+				// groups: {
+				// 	type: BaseTypes.TYPES.LIST,
+				// 	itemType: BaseTypes.TYPES.STRING
+				// }
+			},
+			super.netScheme
+		);
+	}
+	
 	constructor (gameEngine, options, props) {
 		super(gameEngine, options, props);
 
@@ -43,8 +87,7 @@ export default class ObservableObject extends PhysicalObject3D {
 
 		this.groups = [];
 
-		this.configurationKeys = [];
-		this.configurationValues = [];
+
 
 		this.size = new ThreeVector(0, 0, 0);
 		this.weight = 0;
@@ -79,49 +122,6 @@ export default class ObservableObject extends PhysicalObject3D {
 		this.model
 	}
 
-	static get netScheme () {
-		return Object.assign(
-			{
-        // definitive
-
-				size: {type: BaseTypes.TYPES.CLASSINSTANCE},
-				url: { type: BaseTypes.TYPES.STRING },
-				modelID: { type: BaseTypes.TYPES.STRING },
-
-				configuration: {
-					type: BaseTypes.TYPES.LIST,
-					itemType: BaseTypes.TYPES.CLASSINSTANCE
-				}
-				// ,
-				// coins: {
-				// 	type: BaseTypes.TYPES.LIST,
-				// 	itemType: BaseTypes.TYPES.UINT8
-				// },
-        // NOTE: Is there the way to get more of these types or it's not
-        // a good idea
-				// configurationKeys: {
-				// 	type: BaseTypes.TYPES.LIST,
-        //   // NOTE: It's important to set also itemType for LIST type
-				// 	itemType: BaseTypes.TYPES.STRING
-				// },
-				// configurationValues: {
-				// 	type: BaseTypes.TYPES.LIST,
-				// 	itemType: BaseTypes.TYPES.STRING
-				// },
-
-				// not definitive
-				// title: { type: BaseTypes.TYPES.STRING },
-				// weight: {type: BaseTypes.TYPES.FLOAT32},
-				// description: { type: BaseTypes.TYPES.STRING },
-
-				// groups: {
-				// 	type: BaseTypes.TYPES.LIST,
-				// 	itemType: BaseTypes.TYPES.STRING
-				// }
-			},
-			super.netScheme
-		);
-	}
 
 	syncTo (other) {
 		super.syncTo(other);
@@ -133,11 +133,47 @@ export default class ObservableObject extends PhysicalObject3D {
 		this.url = other.url;
 		this.modelID = other.modelID;
 		this.configuration = other.configuration;
-
 		this.weight = other.weight;
+
+		this.setConfiguratorComponent();
+		// el.setAttribute(
+		// 	'gltf-model',
+		// 	`url(${this.url})`
+		// );
+		// let conf = this.configuration.reduce(
+		// 	(previous, current) => {
+		// 		previous[current.key] = current.property;
+		// 		return previous;
+		// 	},
+		// 	{}
+		// );
+		// el.setAttribute(
+		// 	'configurator',
+		// 	`url:models/testingcube.glb;model:testingcube;id:${this.id};configuration:${JSON.stringify(conf)}`
+		// );
 	}
 
 	changeModel (newModel) {
+
+	}
+
+	applyChanges (chunk) {
+		let chunkDictionary = _.reduce(
+			chunk,
+			(acc, conf, index) => {
+				acc[conf[0]] = conf[1];
+				return acc;
+			},
+			{}
+		);
+		// this.configuration
+		_.forEach(
+			this.configuration,
+			(item) => {
+				item.property = chunkDictionary[item.key];
+				debugger
+			}
+		);
 
 	}
 
@@ -168,11 +204,8 @@ export default class ObservableObject extends PhysicalObject3D {
 		this.scene = gameEngine.renderer ? gameEngine.renderer.scene : null;
 		if (this.scene) {
 
-			let el = this.renderEl = document.createElement('a-entity');
-
-
-			console.log(this.configuration);
-			// debugger;
+			this.setDOMElement();
+			let el = this.renderEl;
 
 			// el.setAttribute(
 			// 	'gltf-model',
@@ -214,6 +247,33 @@ export default class ObservableObject extends PhysicalObject3D {
 			// el.setAttribute('game-object-id', this.id);
 			this.scene.appendChild(el);
 		}
+	}
+
+	setDOMElement () {
+		if (!this.renderEl) {
+			// console.log('definging el');
+			this.renderEl = document.createElement('a-entity');
+		}
+	}
+
+	setConfiguratorComponent () {
+		// let el = this.renderEl = document.createElement('a-entity');
+		this.setDOMElement();
+		// el.setAttribute(
+		// 	'gltf-model',
+		// 	`url(${this.url})`
+		// );
+		let conf = this.configuration.reduce(
+			(previous, current) => {
+				previous[current.key] = current.property;
+				return previous;
+			},
+			{}
+		);
+		this.renderEl.setAttribute(
+			'configurator',
+			`url:models/testingcube.glb;model:testingcube;id:${this.id};configuration:${JSON.stringify(conf)}`
+		);
 	}
 
 	delateObjectFromScene () {
