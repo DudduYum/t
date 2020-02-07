@@ -2,14 +2,20 @@ doctype html
 head
 	meta(charset='UTF-8')
 	title Production
+	
 a-scene
 	a-assets
+		img(id="5_bc",src="materials/5/5bc.png")
+		img(id="5_ao",src="materials/5/5ao.png")
+		img(id="5_no",src="materials/5/5no.png")
+		img(id="5_me",src="materials/5/5me.png")
+		img(id="6_bc",src="materials/6/6bc.png")
+		
 		a-asset-item(
 			id="testingcube",
 			src='models/testingcube.glb'
 		)
-	
-	
+		
 	
 	//- a-entity(
 	//- 	id="box3",
@@ -47,7 +53,7 @@ a-scene
 	//- 		onhover="onhoveraction",
 	//- 		onclick="onclickaction"
 	//- 	)
-  
+	
 		
 	
 	//- a-box(
@@ -99,4 +105,5 @@ a-scene
 	
 	
 	a-entity(light='type: ambient')
+	a-entity(light="type: spot; angle: 45")
 	a-entity(light='type: directional')

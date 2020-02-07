@@ -13,6 +13,10 @@ const constants = require ("../common/commonConstants.js").constants;
 // import constants from './commonConstants.js';
 // import constants from '../common/commonConstants.js';
 
+global.imageLoaded = () => {
+	console.warn('hi I have been loaded');
+}
+
 import {
 	GameEngine,
 	CannonPhysicsEngine,
@@ -53,8 +57,24 @@ export default class ServiceLogic extends GameEngine {
 				'Cube': [
 					1,
 					4
-
 				]
+			}
+		};
+
+		this.modelList = {
+			testingcube: 'models/testingcube.glb',
+			house: 'models/testingHouse.glb'
+		}
+
+		this.materialLibrary = {
+			'6': {
+				src: 'materials/5/5bc.png',
+				repeat: {x: 3600, y: 3600},
+				normalMap: 'materials/5/5no.png',
+				normalTextureRepeat:  {x: 3600, y: 3600},
+				metalness:  0,
+				ambientOcclusionMap: 'materials/5/5ao.png',
+				ambientOcclusionTextureRepeat:  {x: 3600, y: 3600}
 			}
 		};
 		// this.scene = this.renderer ? this.renderer.scene : null;
@@ -291,6 +311,9 @@ export default class ServiceLogic extends GameEngine {
 		}
 	}
 
+	getMaterilDefinitionById (id) {
+		return this.materialLibrary[id];
+	}
 
 	// Input recieved handeler
 	inputRecived(params) {
