@@ -18,37 +18,83 @@ AFRAME.registerComponent(
 			configuration: AFrameCustomProperty.getObjectProperty('{}')
 		},
 
+
 		onModelLoad: function (obj) {
 			const scope = this;
+			// let root = new THREE.Object3D();
+
+			global.test = obj;
+			// debugger
+
+			// root.scale.x = buisnessLogic.getScaleFactorForModelId(scope.modelID);
+			// root.scale.y = buisnessLogic.getScaleFactorForModelId(scope.modelID);
+			// root.scale.z = buisnessLogic.getScaleFactorForModelId(scope.modelID);
+
 			obj.name = this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME);
 
 			this.el.setObject3D(
-				// 'mesh',
 				this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME),
-				// 'test',
-				obj.scene.children.reduce(
-					(rootObj, singleMesh) => {
 
-						rootObj.add(singleMesh);
-						// singleMesh.material = this.system.getConfigurationForIdAndMesh(this.data.id , singleMesh.name);
 
-						scope.data.modelIsLoaded = true;
-						// scope.el.setAttribute('configurator', true);
-
-            // I don't know if this is the correct way but
-            // it works, so for now I will not dubt it
-						// debugger;
-						return rootObj;
-					},
-					new THREE.Object3D()
-				)
+				obj.scene
+				// obj.scene.children.reduce(
+				// 	(rootObj, singleMesh) => {
+        //
+				// 		// if (singleMesh.geometry) {
+        //     //
+				// 		// 	rootObj.add(
+				// 		// 		new THREE.Mesh(
+				// 		// 			new THREE.Geometry().fromBufferGeometry(singleMesh.geometry),
+				// 		// 			new THREE.MeshBasicMaterial()
+				// 		// 		)
+				// 		// 	);
+				// 		// } else {
+        //     //
+				// 		// }
+        //
+				// 		debugger
+				// 		rootObj.add(singleMesh);
+        //
+				//
+        //
+				// 		// scope.el.setAttribute('configurator', true);
+        //
+        //     // I don't know if this is the correct way but
+        //     // it works, so for now I will not dubt it
+				// 		// debugger;
+				// 		return rootObj;
+				// 	},
+				// 	// root
+				// 	new THREE.Object3D()
+				// )
 			);
+			// console.log(this.data);
+			// console.log(buisnessLogic.getScaleFactorForModelId(this.data.model));
+
+			Promise.all(this.el.getObject3D(this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME)).children).then(
+				(arr) => {
+      		scope.data.modelIsLoaded = true;
+				}
+			)
+
+
+			this.el.getObject3D(this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME)).scale.set(
+				buisnessLogic.getScaleFactorForModelId(this.data.model),
+				buisnessLogic.getScaleFactorForModelId(this.data.model),
+				buisnessLogic.getScaleFactorForModelId(this.data.model)
+			)
+			// obj.scale.x = obj.scale.x *buisnessLogic.getScaleFactorForModelId(scope.modelID);
+			// obj.scale.y = obj.scale.y *buisnessLogic.getScaleFactorForModelId(scope.modelID);
+			// obj.scale.z = obj.scale.z *buisnessLogic.getScaleFactorForModelId(scope.modelID);
+
 			this.update();
+
 
 		},
 
 		tick: function () {
 			if (this.system.isUpdateIsNeeded(this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME))) {
+
         // I realy don't know if it's legal, but it fucking works
 				this.update();
 			}
@@ -74,7 +120,8 @@ AFRAME.registerComponent(
 
 			this.mesh = this.gltfModelLoader.load(
 				// this.data.url,
-				this.system.getModelPath(this.data.id),
+				// this.system.getModelPath(this.data.id),
+				this.data.url,
 				onModelLoadBinded
 			);
 
@@ -85,9 +132,6 @@ AFRAME.registerComponent(
 				'click',
 				(function (scope) {
 					return function (evt) {
-						console.log(evt);
-						console.log(this.children);
-						console.log(scope);
 
 						this.children.forEach(
 							(item) => {
@@ -101,7 +145,6 @@ AFRAME.registerComponent(
 						// let document.createElement('a-entity');
 					}
 				})(this)
-
 			)
 			this.data.modelIsLoaded = false;
 			// debugger
@@ -122,17 +165,29 @@ AFRAME.registerComponent(
 				this.data.modelIsLoaded
 			) {
 
-
+				// debugger;
 				let self = this;
 				this.el.getObject3D(this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME)).children
 				.map(
 					(child) => {
+						// debugger
 						child.material = this.system.getMaterialById(
 							self.data.configuration[child.name]
 						);
+
+						// if (child.geometry) {
+						// 	console.log(`child ${child.name} is ok`);
+						// } else {
+						// 	console.log(`child ${child.name} is bad`);
+						// }
+
+
 					}
 				);
+
+
 			}
+
 		}
 	}
 
@@ -149,7 +204,9 @@ AFRAME.registerComponent(
 	'configurator-ui-manager',
 	{
 		schema: {
-			uistate: {type: 'boolean', default: false}
+			uistate: { type: 'boolean', default: false},
+			uiposition: { type: 'vec3', default: '0 0 20'},
+			nextFreeSpote: { type: 'vec3', default: '0 0 20'}
 		},
 
 		addButtonsForConfigurablePart: function (buttonsDescription) {
@@ -161,7 +218,6 @@ AFRAME.registerComponent(
 					let offset = 0.4;
 					buttonsDescription[meshName].map(
 						(btnDefinition) => {
-
 							let buttonActiveColor = this.configuratorSystem.data.buttonActiveColor;
 							let	buttonBorderColor = this.configuratorSystem.data.buttonBorderColor;
 
@@ -204,21 +260,17 @@ AFRAME.registerComponent(
 
 			this.ui.setAttribute( "panel-color", configurationPanelColor );
 
-			this.ui.setAttribute( "component-padding","0.1" );
-			this.ui.setAttribute( "opacity","0.8" );
-			this.ui.setAttribute( "width","4.5" );
-			this.ui.setAttribute( "height","3.0" );
-			this.ui.setAttribute( "position","5 1.5 -4" );
-			this.ui.setAttribute( "rotation","0 0 0" );
+			this.ui.setAttribute( "component-padding", "0.1" );
+			this.ui.setAttribute( "opacity", "0.8" );
+			this.ui.setAttribute( "width", "4.5" );
+			this.ui.setAttribute( "height", "3.0" );
+			this.ui.setAttribute( "position", "0 0 15" );
+			this.ui.setAttribute( "rotation", "0 0 0" );
 
       // children button
 			// this.button = document.createElement('a-gui-button');
-
 			_.map(
 				this.configuratorSystem.getConfigurationLogicFor(this.el.getAttribute(CONFIGURATOR_ID_ATRIBUTE_NAME)), //configurationLogic
-				// (item) => {
-				// 	console.log(item);
-				// }
 				this.addButtonsForConfigurablePart.bind(this)
 			);
 
@@ -245,7 +297,6 @@ AFRAME.registerComponent(
 		},
 
 		update: function () {
-
 		}
 	}
 )

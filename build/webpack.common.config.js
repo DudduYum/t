@@ -76,6 +76,6 @@ module.exports = {
 			js: path.resolve(__dirname, '../src/js'),
 			gameObjects: path.resolve(__dirname, '../src/js/common')
 		},
-		extensions: ['.pug','.css','.sass', '.mjs', '.js', '.json', '.bin', '.gltf']
+		extensions: ['.pug','.css','.sass', '.mjs', '.js', '.json', '.bin', '.gltf', '.png']
 	}
 };

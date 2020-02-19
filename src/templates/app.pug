@@ -2,108 +2,151 @@ doctype html
 head
 	meta(charset='UTF-8')
 	title Production
-	
-a-scene
-	a-assets
-		img(id="5_bc",src="materials/5/5bc.png")
-		img(id="5_ao",src="materials/5/5ao.png")
-		img(id="5_no",src="materials/5/5no.png")
-		img(id="5_me",src="materials/5/5me.png")
-		img(id="6_bc",src="materials/6/6bc.png")
+	link( rel='stylesheet', href='uikit.min.css')
+	script(src='uikit.min.js')
+	script(src='uikit-icons.min.js')
+	style(type='text/css').
+		.html-panel {
+			z-index: 10;
+		}
+	script(type='text/javascript').
+		function hideOverlay() {
+			var overlay= document.getElementById('overlay');
+			
+			if (overlay) {
+				overlay.classList.toggle('html-panel');
+			}
+			console.log(overlay)
+		}
 		
-		a-asset-item(
-			id="testingcube",
-			src='models/testingcube.glb'
-		)
+		function getHeight () {
+			hideOverlay()
+			return Number.parseFloat(document.getElementById('height-value').value) * 0.01;
+		}
 		
-	
-	//- a-entity(
-	//- 	id="box3",
-	//- 	position="-4 2 -6",
-	//- 	geometry="primitive: box",
-	//- 	material="shader: flat; color: red",
-	//- 	configurable
-	//- )
-	
-	//- a-entity(
-	//- 	gltf-model='#testingcube',
-	//- 	position='10 0 -3',
-	//- 	testcomponent
-	//- )
-	
-	//- a-entity(
-	//- 	gltf-model='url(models/testingcube.glb)',
-	//- 	position='10 0 -3',
-	//- 	testcomponent
-	//- )
-	
-	//- a-gui-flex-container(
-	//- 	flex-direction="column",
-	//- 	justify-content="center",
-	//- 	align-items="normal",
-	//- 	component-padding="0.1",
-	//- 	opacity="0.7",
-	//- 	width="4.5",
-	//- 	height="3.0",
-	//- 	position="2 1.5 -4",
-	//- 	rotation="0 0 0"
-	//- )
-	//- 	a-gui-button(
-	//- 		value="materiale1",
-	//- 		onhover="onhoveraction",
-	//- 		onclick="onclickaction"
-	//- 	)
-	
 		
 	
-	//- a-box(
-	//- 	id="box1",
-	//- 	position="-1 0.5 -3",
-	//- 	rotation="0 45 0",
-	//- 	color="#4CC3D9",
-	//- 	configurable-asset='',
-	//- 	event-set__enter="_event: mouseenter; color: #8FF7FF; _target: #box2; visible: false",
-	//- 	event-set__leave="_event: mouseleave; color: #4CC3D9; _target: #box2; visible: treu"
-	//- )
-	
-	//- a-box(
-	//- 	id="box2",
-	//- 	position="-5 0.5 -3",
-	//- 	rotation="0 45 0",
-	//- 	color="#4CC3D9",
-	//- 	event-set__enter="_event: mouseenter; color: #4CC3D9; _target: #box1; visible: false",
-	//- 	event-set__leave="_event: mouseleave; color: #8FF7FF; _target: #box1; visible: true"
-	//- )
-	
-	a-entity(
-		id="cameraRig",
-		position="0 1.6 0"
-	)
-		a-camera(
-			look-controls,
-			wasd-controls,
-			position="0 0 0"
-		)
-			a-gui-cursor(
-				id="cursor",
-				raycaster="objects: [gui-interactable]",
-				fuse="true",
-				fuse-timeout="2000",
-				cursor="fuse: true; fuseTimeout: 500",
-				design="dot",
-				color="#009900"
-			)
-			//- a-cursor
-			//- a-entity(
-			//- 	cursor="fuse: true; fuseTimeout: 2000",
-			//- 	position="0 0 -1",
-			//- 	geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03",
-			//- 	material="color: black; shader: flat"
-			//- )
+body
+	div(id='overlay',class='uk-position-cover uk-overlay uk-overlay-default uk-flex uk-flex-center uk-flex-middle html-panel')
+		form
+			div( class="uk-margin")
+				div( class="uk-inline")
+					input(class='uk-input',type='text', id='nickname-value', placeholder='Hishman')
+					label(class='uk-form-label',for='nickname-value').
+						Inserisci il tuo nickname
+			div( class="uk-margin")
+				div( class="uk-inline")
+					input(class='uk-range',type='range', id='height-value', min='50', max='270')
+					label(class='uk-form-label',for='height-value').
+						La tua altezza è: 181 cm
+		div( class="uk-margin")
+			div( class="uk-inline")
+				button(class='uk-button uk-button-secondary uk-button-large',onclick='initUserHeight(getHeight())').
+					conferma
 
-	
-	
-	
-	a-entity(light='type: ambient')
-	a-entity(light="type: spot; angle: 45")
-	a-entity(light='type: directional')
+			
+
+	a-scene
+		a-assets
+			img(id="5_bc",src="materials/5/5bc.png")
+			img(id="5_ao",src="materials/5/5ao.png")
+			img(id="5_no",src="materials/5/5no.png")
+			img(id="5_me",src="materials/5/5me.png")
+			img(id="6_bc",src="materials/6/6bc.png")
+			
+			a-asset-item(
+				id="testingcube",
+				src='models/testingcube.glb'
+			)
+			
+		
+		//- a-entity(
+		//- 	id="box3",
+		//- 	position="-4 2 -6",
+		//- 	geometry="primitive: box",
+		//- 	material="shader: flat; color: red",
+		//- 	configurable
+		//- )
+		
+		//- a-entity(
+		//- 	gltf-model='#testingcube',
+		//- 	position='10 0 -3',
+		//- 	testcomponent
+		//- )
+		
+		//- a-entity(
+		//- 	gltf-model='url(models/testingcube.glb)',
+		//- 	position='10 0 -3',
+		//- 	testcomponent
+		//- )
+		
+		//- a-gui-flex-container(
+		//- 	flex-direction="column",
+		//- 	justify-content="center",
+		//- 	align-items="normal",
+		//- 	component-padding="0.1",
+		//- 	opacity="0.7",
+		//- 	width="4.5",
+		//- 	height="3.0",
+		//- 	position="2 1.5 -4",
+		//- 	rotation="0 0 0"
+		//- )
+		//- 	a-gui-button(
+		//- 		value="materiale1",
+		//- 		onhover="onhoveraction",
+		//- 		onclick="onclickaction"
+		//- 	)
+		
+			
+		
+		//- a-box(
+		//- 	id="box1",
+		//- 	position="-1 0.5 -3",
+		//- 	rotation="0 45 0",
+		//- 	color="#4CC3D9",
+		//- 	configurable-asset='',
+		//- 	event-set__enter="_event: mouseenter; color: #8FF7FF; _target: #box2; visible: false",
+		//- 	event-set__leave="_event: mouseleave; color: #4CC3D9; _target: #box2; visible: treu"
+		//- )
+		
+		//- a-box(
+		//- 	id="box2",
+		//- 	position="-5 0.5 -3",
+		//- 	rotation="0 45 0",
+		//- 	color="#4CC3D9",
+		//- 	event-set__enter="_event: mouseenter; color: #4CC3D9; _target: #box1; visible: false",
+		//- 	event-set__leave="_event: mouseleave; color: #8FF7FF; _target: #box1; visible: true"
+		//- )
+		
+		a-entity(
+			id="cameraRig",
+			position="0 1.6 0"
+		)
+			a-camera(
+				wasd-controls,
+				collider-check=''
+				position="0 0 0",
+			)
+				a-gui-cursor(
+					id="cursor",
+					raycaster="objects: [gui-interactable],.clickable; interval: 1; showLine: true;",
+					
+					cursor="fuse: true; fuseTimeout: 500",
+					design="dot",
+					color="#009900"
+				)
+				
+				//- a-cursor
+				//- a-entity(
+				//- 	cursor="fuse: true; fuseTimeout: 2000",
+				//- 	position="0 0 -1",
+				//- 	geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03",
+				//- 	material="color: black; shader: flat"
+				//- )
+
+		
+		
+		
+		a-entity(light='type: ambient')
+		a-entity(light="type: spot; angle: 45")
+		a-entity(light='type: directional')

@@ -14,6 +14,7 @@ export default class ServiceUserEngine extends ClientEngine {
   /*It may be a good thing to let the user modify the method, to set the
 	way how the client will send configuration to the server */
 	sendConfiguration (conf) {
+
 		this.sendInput(
 			{
 				command: constants.userSendNewConfigurationChunk,
@@ -34,41 +35,78 @@ export default class ServiceUserEngine extends ClientEngine {
 		this.gameEngine.on('preStep', this.onStap.bind(this));
 
 		this.gamePadList = [];
+		global.buisnessLogic = this.gameEngine;
 
+    // this method is used to send new configuration to the server
 		global.emiter.on(
 			constants.onConfigurationChangeEventName,
+
 			this.sendConfiguration.bind(this) // I left it like this becouse, I would
       // like to give the possibility to whoever may came across this class, to
       // modify its functionality by just extendi methods
-		)
+		);
 
-		if (global) {
-			global.addEventListener(
-				'gamepadconnected',
-				((scope) => {
-					return (e) => {
-						scope.registerGamePad(e.gamepad);
-					}
-				})(this)
+		// it's my fu*kedup way to parameterisais my callbacks
+		global[constants.changeUserPositionFunction] = function (position) {
+			emiter.emit(
+				constants.avatarpositionchange,
+				{
+					movement: position
+				}
 			);
+		};
 
-			// global.addEventListener(
-			// 	'keydown',
-			// 	function (e) {
-			// 		console.log('test');
-			// 		switch (e.key) {
-			// 			case 't':‘’
-			// 				console.log('t');
-			// 				break;
-			// 			default:
-      //
-			// 		}
-			// 	}
-			// )
+		// I use this method to send the position of the user
+		global.emiter.on(
+			constants.movementEvent,
+			this.moveTheAvatar.bind(this)
+		);
+
+    // user get height
+		global.emiter.on(
+			constants.initUserHeight,
+			this.changeHeight.bind(this)
+		);
+
+		global.initUserHeight = this.changeHeight.bind(this);
+
+		global.addEventListener(
+			'gamepadconnected',
+			((scope) => {
+				return (e) => {
+					scope.registerGamePad(e.gamepad);
+				}
+			})(this)
+		);
+		// global.addEventListener(
+		// 	'keydown',
+		// 	function (e) {
+		// 		console.log('test');
+		// 		switch (e.key) {
+		// 			case 't':‘’
+		// 				console.log('t');
+		// 				break;
+		// 			default:
+		//
+		// 		}
+		// 	}
+		// )
+
+
+
+		// emiter.on(
+		// 	constants.onConfigurationChangeEventName,
+		// 	this.sendConfiguration.bind(this)
+		// );
+
+		// global.emiter.on(
+		// 	constants.avatarpositionchange,
+		// 	this.moveTheAvatar.bind(this)
+		// )
+		if (global) {
+
+
 		}
-
-
-
 		// if (global) {
     //
 		// 	// global.addEventListener(
@@ -190,6 +228,34 @@ export default class ServiceUserEngine extends ClientEngine {
 		// }
 	}
 
+	sendConfiguration (conf) {
+		this.sendInput(
+			{
+				command: constants.userSendNewConfigurationChunk,
+
+				params: {
+					configuration: conf
+				}
+			}
+		);
+	}
+
+	changeHeight (value) {
+		// debugger
+		this.sendInput({
+			command:  constants.initUserHeightServer,
+			params: value
+		});
+	}
+
+	moveTheAvatar (movemet) {
+		this.sendInput({
+			command: constants.avatarpositionchangeServer,
+			params: movemet
+		});
+	}
+
+
 	onStap(arg) {
 		let list = global.navigator.getGamepads();
 		this.gamePadList.map(
@@ -251,6 +317,8 @@ export default class ServiceUserEngine extends ClientEngine {
 			}
 		);
 	}
+
+
 
 	onObjectAdd (objData, options) {
 		if (objData instanceof Avatar) {

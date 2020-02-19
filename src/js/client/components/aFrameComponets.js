@@ -1,5 +1,6 @@
 // import EventEmitter from 'eventemitter3';
 import './a-configurator';
+import './a-navigator';
 
 import * as CANNON from 'cannon';
 // let emiter = new EventEmitter();

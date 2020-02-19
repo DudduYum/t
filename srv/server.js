@@ -15,6 +15,7 @@ const serviceName = 'app';
 const INDEX = path.join(__dirname, `../${buildDir}/${serviceName}.html`);
 const LOGIC = path.join(__dirname, `../${buildDir}/${serviceName}.js`);
 const ASSETS = path.join(__dirname, `../${buildDir}/assets`);
+const UIKIT = path.join(__dirname, `../${buildDir}/uikit`);
 
 // // define routes and socket
 const server = express();
@@ -37,10 +38,24 @@ server.use(
 	)
 );
 
+server.use(
+	express.static(
+		UIKIT
+	)
+);
+
 server.get(
 	'/',
 	function (req, res) {
 		res.sendFile(INDEX);
+	}
+);
+
+
+server.get(
+	`/${serviceName}.js`,
+	function (req, res) {
+		res.sendFile(LOGIC);
 	}
 );
 

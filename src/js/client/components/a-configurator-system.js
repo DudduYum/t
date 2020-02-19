@@ -1,7 +1,7 @@
 import AFrameCustomProperty from '../../utils/aframeCustomProperty.js';
 import _ from 'lodash';
 import {constants} from '../../common/commonConstants.js';
-
+let Promise = require('bluebird');
 // deprecated
 // const onConfigurationChangeEventName = 'currentUserChangeConfiguration';
 global.onConfigurationChangeEventName = constants.onConfigurationChangeEventName;
@@ -31,7 +31,8 @@ AFRAME.registerSystem(
 
 			configurationLogic: AFrameCustomProperty.getObjectProperty(),
 			configuration: AFrameCustomProperty.getObjectProperty(),
-			configurableObjects: AFrameCustomProperty.getObjectProperty()
+			configurableObjects: AFrameCustomProperty.getObjectProperty(),
+			materials: AFrameCustomProperty.getObjectProperty()
 			// configuration: {
 			// 	default: '{}',
 			// 	parse: function (value) {
@@ -48,14 +49,18 @@ AFRAME.registerSystem(
 			this.dracoLoader = new THREE.DRACOLoader();
 			this.dracoLoader.setPath(path);
 
+			this.textureLoader = new THREE.TextureLoader();
+
 			// register the event listetener for configuration update
-			emiter.on(
+			global.emiter.on(
 				'configurationObjectUpdate',
 				function(arg) {
 					// NOTE: now you must update the current system state
 					// with the new parameters caming from the server
 				}
 			);
+
+
 
 			this.data.configurationPanelColor = '#cccfff';
 			this.data.buttonBorderColor = '#42fc10';
@@ -91,9 +96,83 @@ AFRAME.registerSystem(
 			this.data.configurationLogic.testingcube.meshes = {};
 			this.data.configurationLogic.testingcube.meshes.Cube = [1, 3];
 
+			this.data.configurationLogic.susan = {};
+			this.data.configurationLogic.susan.meshes = {};
+			this.data.configurationLogic.susan.meshes.Suzanne = [8, 2];
+
+			this.data.configurationLogic.house = buisnessLogic.getConfigurationLogicForSystem('house');
+
+
 			// global[constants.changeConfigurationHandlerEventName] = this.changeConfiguration.bind(this);
 			// debugger
 			global.changeConfigurationHandler = this.changeConfiguration.bind(this);
+		},
+
+		loadMaterial: function (materialDefinition, materialID) {
+			const scope = this;
+			let lilP = _.reduce(
+				materialDefinition,
+				function (acc, value, key) {
+					if (key == 'map' || key == 'normalMap' || key == 'aoMap') { // NOTE: compleate the list
+						acc.push(
+							Promise.join(
+								Promise.resolve(key),
+								new Promise(
+									(res, rej) => {
+										scope.textureLoader.load(
+											value,
+											function(tx) {
+												tx.wrapS = THREE.RepeatWrapping;
+												tx.wrapT = THREE.RepeatWrapping;
+												tx.repeat.set(1, 1);
+												res(tx);
+											}
+										)
+									}
+								),
+								function (k, v) {
+									return {[k]:v};
+								}
+							)
+						);
+					} else {
+						acc.push(
+							Promise.join(
+								Promise.resolve(key),
+								Promise.resolve(value),
+								function (k, v) {
+									return {[k]:v};
+								}
+							)
+						);
+					}
+					return acc;
+				},
+				[]
+			);
+
+			Promise.all(lilP)
+			.then(
+				(res) => {
+
+					this.data.materials[materialID] = new THREE.MeshStandardMaterial(
+						res.reduce(
+							(acc, item) => {
+								// debugger
+								return Object.assign(acc, item);
+							},
+							{}
+						)
+					);
+
+
+
+					this.data.materials[materialID].side = THREE.DoubleSide;
+				}
+			)
+			// .all();
+
+			materialDefinition
 		},
 
 
@@ -104,8 +183,32 @@ AFRAME.registerSystem(
 		// material definition
 		getMaterialById: function (materialID) {
 			// return this.data.materialLibrary[Math.round(Math.random() * this.data.materialLibrary.length)];
-			return this.data.materialLibrary[materialID];
+			// _.forEach(
+			// 	global.buisnessLogic.getMaterialById(materialID),
+			// 	function (value, key, collection) {
+			// 		if (key == 'map') {
+			// 			collection[key] = new THREE.Textru
+			// 		}
+			// 	}
+			// );
+			let currentMaterial;
+			if (this.data.materials[materialID]) {
+				// console.log('here');
+				currentMaterial = this.data.materials[materialID];
+			} else {
+				this.loadMaterial(
+					global.buisnessLogic.getMaterilDefinitionById(materialID),
+					materialID
+				);
+				currentMaterial = new THREE.MeshStandardMaterial({color: '#423'})
+			}
+
+			return currentMaterial;
+			// return global.buisnessLogic.getMaterialById(materialID);
+			// return this.data.materialLibrary[materialID];
 		},
+			// return this.data.materialLibrary[Math.round(Math.random() * this.data.materialLibrary.length)];
+
 
 		getDefaultMaterial: function () {
       // NOTE: this is usefull, but right now it's not correct,
@@ -120,8 +223,6 @@ AFRAME.registerSystem(
 		to configure the object apearence and there will be
 		less information to exchage toword othe user*/
 		registerConfigurableObject: function (id, configuration, model) {
-
-
 
       // register an id as a model
 			this.data.configurableObjects[id] = model;
@@ -212,7 +313,8 @@ AFRAME.registerSystem(
 		default name, each configurator is listening for the event and decide
 		if it must do something with it.*/
 		changeConfiguration: function (argv) {
-			this.data.updateRequest[argv[0]] = true;
+
+			// this.data.updateRequest[argv[0]] = true;
 			global.emiter.emit(
 				constants.onConfigurationChangeEventName,
 				// NOTE: this event will be consumed by clientClass
@@ -248,7 +350,6 @@ AFRAME.registerSystem(
 		},
 
 		getMaterialListForModelMesh: function (model, meshname) {
-			debugger;
 			return this.data.materialLibrary[this.data.configuration[model].meshes[meshname]];
 		},
 

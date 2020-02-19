@@ -4,7 +4,7 @@ import {PhysicalObject3D, BaseTypes} from 'lance-gg';
 import _ from 'lodash';
 global.$ = require('jquery');
 
-
+// import {constants} from './commonConstants.js';
 // var DynamicObject = require('lance/server/lance-gg').DynamicObject;
 
 export default class Ground extends PhysicalObject3D {
@@ -92,8 +92,23 @@ export default class Ground extends PhysicalObject3D {
 				// `shader:standard;side:both;src:#6bc;`
 			);
 
+			// el.classList.add('collidable');
+			el.classList.add('clickable');
 
+			el.setAttribute(
+				'gui-item',
+				''
+			);
 
+			// el.addEventListener(
+			// 	'click',
+			// 	function () {
+			// 		console.log('test ground side');
+			// 	}
+			// );
+
+			el.setAttribute('cursor-listener', '');
+			el.setAttribute('raycaster-listener', '');
 			el.setAttribute('rotation', '60 20 70');
 		}
 	}

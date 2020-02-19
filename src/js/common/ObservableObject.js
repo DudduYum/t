@@ -24,6 +24,7 @@ export default class ObservableObject extends PhysicalObject3D {
 				url: { type: BaseTypes.TYPES.STRING },
 				modelID: { type: BaseTypes.TYPES.STRING },
 
+
 				configuration: {
 					type: BaseTypes.TYPES.LIST,
 					itemType: BaseTypes.TYPES.CLASSINSTANCE
@@ -58,7 +59,7 @@ export default class ObservableObject extends PhysicalObject3D {
 			super.netScheme
 		);
 	}
-	
+
 	constructor (gameEngine, options, props) {
 		super(gameEngine, options, props);
 
@@ -69,21 +70,16 @@ export default class ObservableObject extends PhysicalObject3D {
 			this.configuration = props.configuration;
 			// this.configuration = [];
 
+			this.modelID = props.modelID;
+
+			this.url = gameEngine.getModelUrl(this.modelID);
 
 			console.log('X');
 		} else {
-			console.log('O');
 			this.modelID = '';
 
 			this.configuration = [];
 		}
-
-
-		this.title = 'cube';
-
-		this.url = 'models/testingcube.glb';
-
-		this.description = 'It\'s a test cube';
 
 		this.groups = [];
 
@@ -158,6 +154,7 @@ export default class ObservableObject extends PhysicalObject3D {
 	}
 
 	applyChanges (chunk) {
+
 		let chunkDictionary = _.reduce(
 			chunk,
 			(acc, conf, index) => {
@@ -166,12 +163,15 @@ export default class ObservableObject extends PhysicalObject3D {
 			},
 			{}
 		);
+
+
 		// this.configuration
 		_.forEach(
 			this.configuration,
 			(item) => {
-				item.property = chunkDictionary[item.key];
-				debugger
+				if (chunkDictionary[item.key]) {
+					item.property = chunkDictionary[item.key];
+				}
 			}
 		);
 
@@ -218,9 +218,11 @@ export default class ObservableObject extends PhysicalObject3D {
 				},
 				{}
 			);
+
 			el.setAttribute(
 				'configurator',
-				`url:models/testingcube.glb;model:testingcube;id:${this.id};configuration:${JSON.stringify(conf)}`
+				`url:${this.url};model:${this.modelID};id:${this.id};configuration:${JSON.stringify(conf)}`
+				// `url:models/testingcube.glb;model:testingcube;id:${this.id};configuration:${JSON.stringify(conf)}`
 			);
 
 			el.setAttribute(

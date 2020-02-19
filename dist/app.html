@@ -1,1 +1,21 @@
-<!DOCTYPE html><head><meta charset="UTF-8"><title>Production</title><script type="text/javascript" src="/app.js?7105c1186e9fa8dc417e"></script></head><a-scene><a-assets><img id="5_bc" src="materials/5/5bc.png"><img id="5_ao" src="materials/5/5ao.png"><img id="5_no" src="materials/5/5no.png"><img id="5_me" src="materials/5/5me.png"><img id="6_bc" src="materials/6/6bc.png"><a-asset-item id="testingcube" src="models/testingcube.glb"></a-asset-item></a-assets><a-entity id="cameraRig" position="0 1.6 0"><a-camera look-controls wasd-controls position="0 0 0"><a-gui-cursor id="cursor" raycaster="objects: [gui-interactable]" fuse="true" fuse-timeout="2000" cursor="fuse: true; fuseTimeout: 500" design="dot" color="#009900"></a-gui-cursor></a-camera></a-entity><a-entity light="type: ambient"></a-entity><a-entity light="type: spot; angle: 45"></a-entity><a-entity light="type: directional"></a-entity></a-scene>
+<!DOCTYPE html><head><meta charset="UTF-8"><title>Production</title><link rel="stylesheet" href="uikit.min.css"><script src="uikit.min.js"></script><script src="uikit-icons.min.js"></script><style type="text/css">.html-panel {
+	z-index: 10;
+}</style><script type="text/javascript">function hideOverlay() {
+	var overlay= document.getElementById('overlay');
+	
+	if (overlay) {
+		overlay.classList.toggle('html-panel');
+	}
+	console.log(overlay)
+}
+
+function getHeight () {
+	hideOverlay()
+	return Number.parseFloat(document.getElementById('height-value').value) * 0.01;
+}
+
+
+</script><script type="text/javascript" src="/app.js?3a54a69f8314bd0fc66c"></script></head><body><div class="uk-position-cover uk-overlay uk-overlay-default uk-flex uk-flex-center uk-flex-middle html-panel" id="overlay"><form><div class="uk-margin"><div class="uk-inline"><input class="uk-input" type="text" id="nickname-value" placeholder="Hishman"><label class="uk-form-label" for="nickname-value">Inserisci il tuo nickname</label></div></div><div class="uk-margin"><div class="uk-inline"><input class="uk-range" type="range" id="height-value" min="50" max="270"><label class="uk-form-label" for="height-value">La tua altezza è: 181 cm</label></div></div></form><div class="uk-margin"><div class="uk-inline"><button class="uk-button uk-button-secondary uk-button-large" onclick="initUserHeight(getHeight())">conferma
+
+
+</button></div></div></div><a-scene><a-assets><img id="5_bc" src="materials/5/5bc.png"><img id="5_ao" src="materials/5/5ao.png"><img id="5_no" src="materials/5/5no.png"><img id="5_me" src="materials/5/5me.png"><img id="6_bc" src="materials/6/6bc.png"><a-asset-item id="testingcube" src="models/testingcube.glb"></a-asset-item></a-assets><a-entity id="cameraRig" position="0 1.6 0"><a-camera wasd-controls collider-check="" position="0 0 0"><a-gui-cursor id="cursor" raycaster="objects: [gui-interactable],.clickable; interval: 1; showLine: true;" cursor="fuse: true; fuseTimeout: 500" design="dot" color="#009900"></a-gui-cursor></a-camera></a-entity><a-entity light="type: ambient"></a-entity><a-entity light="type: spot; angle: 45"></a-entity><a-entity light="type: directional"></a-entity></a-scene></body>

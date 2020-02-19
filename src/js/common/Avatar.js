@@ -1,4 +1,11 @@
-import {PhysicalObject3D, ThreeVector, Quaternion, BaseTypes} from 'lance-gg';
+import {
+	PhysicalObject3D,
+	ThreeVector,
+	Quaternion,
+	BaseTypes
+} from 'lance-gg';
+
+import constants from './commonConstants';
 
 // import {CustomController} from '../client/controlls/Controlls';
 
@@ -7,6 +14,14 @@ import {PhysicalObject3D, ThreeVector, Quaternion, BaseTypes} from 'lance-gg';
 export default class Avatar extends PhysicalObject3D {
 	constructor (gameEngine, options, props) {
 		super(gameEngine, options, props);
+
+		if (props && props.isOnServerSide ) {
+			this.position = props.position;
+			this.height = props.height;
+		} else {
+			this.position = new ThreeVector(0,0,0)
+			this.height = 1.6;
+		}
 
 		// step user
 		this.step = 0.25;
@@ -21,13 +36,6 @@ export default class Avatar extends PhysicalObject3D {
 
 		this.direction = new ThreeVector(0, 0, -1);
 
-		if (props) {
-			if (props.height) {
-				this.height = props.height;
-			} else {
-				this.height = 1.6;
-			}
-		}
 	}
 
 	static getCamera () {
@@ -41,6 +49,13 @@ export default class Avatar extends PhysicalObject3D {
 		// );
 
 		return camera;
+	}
+
+	static setCamera (pos, height) {
+		// document.querySelector('#cameraRig');
+		// debugger;
+		// document.querySelector('#cameraRig').setAttribute('position', `5 1 5`);
+		document.querySelector('#cameraRig').setAttribute('position', `${pos.x} ${height} ${pos.y}`);
 	}
 
 	static get netScheme () {
@@ -57,6 +72,8 @@ export default class Avatar extends PhysicalObject3D {
 	syncTo (other) {
 		super.syncTo( other );
 
+	// debugger
+
 		this.direction.set(
 			other.direction.x,
 			0,
@@ -71,12 +88,12 @@ export default class Avatar extends PhysicalObject3D {
 
 		this.height = other.height;
 
-		let camera = Avatar.getCamera();
-
-		camera.setAttribute(
-			'position',
-			`${this.position.x} ${this.height} ${this.position.z}`
-		);
+		// let camera = Avatar.getCamera();
+		Avatar.setCamera(this.position, this.height);
+		// camera.setAttribute(
+		// 	'position',
+		// 	`${this.position.x} ${this.height} ${this.position.z}`
+		// );
 	}
 
 	assignCamera (camera) {
@@ -123,6 +140,12 @@ export default class Avatar extends PhysicalObject3D {
 		// console.log(q);
 	}
 
+	initHeight (value) {
+		emiter.emit(
+			constants.initUserHeight,
+			value
+		);
+	}
 
 	onAddToWorld (gameEngine) {
 		this.gameEngine = gameEngine;
@@ -149,8 +172,25 @@ export default class Avatar extends PhysicalObject3D {
 			this.position.z
 		);
 
+
+
 		// console.warn('test');
 		// console.warn(this);
+		this.scene = gameEngine.renderer ? gameEngine.renderer.scene : null;
+		if (this.scene) {
+
+			this.setDOMElement();
+			let el = this.renderEl;
+
+			// el.setAttribute(
+			// 	'navigator',
+			// 	`position: 2 0.5 0`
+			// 	// `url:models/testingcube.glb;model:testingcube;id:${this.id};configuration:${JSON.stringify(conf)}`
+			// );
+
+			this.scene.appendChild(el);
+		}
+
 
 		// this.scene = gameEngine.renderer ? gameEngine.renderer.scene : null;
 		// if (this.scene) {
@@ -180,8 +220,14 @@ export default class Avatar extends PhysicalObject3D {
 		// 	);
     //
 		// 	el.setAttribute('game-object-id', this.id);
-		// 	this.scene.appendChild(el);
 		// }
+	}
+
+	setDOMElement () {
+		if (!this.renderEl) {
+			// console.log('definging el');
+			this.renderEl = document.createElement('a-entity');
+		}
 	}
 
 	delateObjectFromScene () {
