@@ -27,7 +27,7 @@
     "cannon": "^0.6.2",
     "core-js": "^3.3.2",
     "eventemitter3": "^4.0.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "jquery": "^3.4.1",
     "lance-gg": "^4.0.8",
     "lodash": "^4.17.15",
